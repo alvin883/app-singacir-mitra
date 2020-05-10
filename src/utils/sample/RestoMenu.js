@@ -1,0 +1,48 @@
+const RestoMenu = [
+  {
+    menu_id: "3d97aa77-1a9d-4d6b-b772-56753e978941",
+    menu_pict: "https://picsum.photos/200",
+    menu_name: "Pepes",
+    menu_price: 25000,
+    menu_description: `Objectively create pandemic portals with global networks. Globally myocardinate viral imperatives through technically sound e-markets`,
+    promo_price: 20000,
+    promo_start: 1577811600,
+    promo_end: 1585674000,
+    promo_description: `Objectively create pandemic portals with global networks. Globally myocardinate viral imperatives through technically sound e-markets`,
+  },
+  {
+    menu_id: "cde47fa6-5c80-4a20-a38c-b94b91a4ffbd",
+    menu_pict: "https://picsum.photos/200",
+    menu_name: "Ayam Goreng",
+    menu_price: 25000,
+    menu_description: `Objectively create pandemic portals with global networks. Globally myocardinate viral imperatives through technically sound e-markets`,
+    promo_price: 20000,
+    promo_start: 1577811600,
+    promo_end: 1585674000,
+    promo_description: `Objectively create pandemic portals with global networks. Globally myocardinate viral imperatives through technically sound e-markets`,
+  },
+  {
+    menu_id: "42104c14-b806-4ef1-a542-a6df2e9d5f16",
+    menu_pict: "https://picsum.photos/200",
+    menu_name: "Bebek Goreng",
+    menu_price: 25000,
+    menu_description: `Objectively create pandemic portals with global networks. Globally myocardinate viral imperatives through technically sound e-markets`,
+    promo_price: 20000,
+    promo_start: 1577811600,
+    promo_end: 1585674000,
+    promo_description: `Objectively create pandemic portals with global networks. Globally myocardinate viral imperatives through technically sound e-markets`,
+  },
+  {
+    menu_id: "868c972c-48a6-4824-9b94-9ce89fc6eb0a",
+    menu_pict: "https://picsum.photos/200",
+    menu_name: "Pecel Lele",
+    menu_price: 25000,
+    menu_description: `Objectively create pandemic portals with global networks. Globally myocardinate viral imperatives through technically sound e-markets`,
+    promo_price: 20000,
+    promo_start: 1577811600,
+    promo_end: 1585674000,
+    promo_description: `Objectively create pandemic portals with global networks. Globally myocardinate viral imperatives through technically sound e-markets`,
+  },
+]
+
+export default RestoMenu

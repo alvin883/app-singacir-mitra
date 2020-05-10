@@ -1,0 +1,17 @@
+{
+    "tabWidth": 4,
+    "bracketSpacing": true,
+    "semi": true,
+    "singleQuote": false,
+    "jsxBracketSameLine": true,
+    "trailingComma": "all",
+    "overrides": [
+        {
+            "files": "*.js",
+            "options": {
+                "tabWidth": 2,
+                "semi": false
+            }
+        }
+    ]
+}

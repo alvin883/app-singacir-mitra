@@ -1,0 +1,49 @@
+{
+    "vetur.format.defaultFormatter.js": "prettier",
+    "vetur.format.defaultFormatter.ts": "prettier",
+    "vetur.format.defaultFormatter.html": "prettyhtml",
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "[javascript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.tabSize": 2
+    },
+    "files.associations": {
+        "*.js": "javascriptreact"
+    },
+    "editor.formatOnSave": true,
+
+    // This is for make intellisense work with babel module-resolver
+    "editor.acceptSuggestionOnCommitCharacter": false,
+
+    // Additional Highlighter
+    "todohighlight.keywords": [
+        {
+            "text": "NOTE:",
+            "color": "#ffffff",
+            "backgroundColor": "#673AB7",
+            "overviewRulerColor": "#673AB7"
+        },
+        {
+            "text": "DEBUG:",
+            "color": "#000000",
+            "backgroundColor": "#00ff00",
+            "overviewRulerColor": "#673AB7"
+        },
+        {
+            "text": "SET_API",
+            "color": "#ffffff",
+            "backgroundColor": "#4860d8",
+            "overviewRulerColor": "#4860d8"
+        },
+        {
+            "text": "SET_REDUCER",
+            "color": "#0E534F",
+            "backgroundColor": "#2FEDE2",
+            "overviewRulerColor": "#4860d8"
+        }
+    ],
+
+    // To add type-checking using JSDoc
+    // @link https://hackernoon.com/why-i-no-longer-use-typescript-with-react-and-why-you-shouldnt-either-e744d27452b4
+    "javascript.implicitProjectConfig.checkJs": true
+}
