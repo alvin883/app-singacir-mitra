@@ -1,13 +1,14 @@
-import React, { Component, useState } from "react"
-import { View, StyleSheet, ScrollView } from "react-native"
+import React, { Component, useState, useCallback } from "react"
+import { View, StyleSheet, ScrollView, StatusBar } from "react-native"
 import PropTypes from "prop-types"
 import { Divider, Button } from "_atoms"
 import { ProfileHeader, ProfileButton, PairTitleValue } from "_molecules"
-import { Spaces } from "_styles"
+import { Spaces, Colors } from "_styles"
 import { convertToCurrency, sample, navigationServices } from "_utils"
 import { useDispatch } from "react-redux"
 import { auth } from "_actions"
 import AsyncStorage from "@react-native-community/async-storage"
+import { useFocusEffect } from "@react-navigation/native"
 
 const Landing = () => {
   const dispatch = useDispatch()
@@ -31,7 +32,7 @@ const Landing = () => {
 
   const clickDonation = () => {
     if (isLoading) return false
-    alert("History Donasi")
+    navigationServices.Navigate("profile/donation-history")
   }
 
   const clickChangePass = () => {
@@ -50,6 +51,13 @@ const Landing = () => {
         alert("Terjadi kesalahan saat logout, silahkan coba lagi")
       })
   }
+
+  useFocusEffect(
+    useCallback(() => {
+      StatusBar.setBackgroundColor(Colors.themeLight)
+      StatusBar.setBarStyle("dark-content")
+    }, []),
+  )
 
   return (
     <ScrollView>

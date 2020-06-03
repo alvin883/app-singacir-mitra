@@ -54,6 +54,12 @@ const ProfileStack = () => {
           customBackAction: submitSuccessDonation,
         }}
       />
+
+      <Stack.Screen
+        name="profile/donation-history"
+        component={Profile.DonationHistory}
+        options={{ title: "History Donasi" }}
+      />
     </Stack.Navigator>
   )
 }

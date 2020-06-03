@@ -1,52 +1,44 @@
 import React from "react"
 import { createStackNavigator } from "@react-navigation/stack"
-import {
-  KomunitasDetail,
-  KomunitasCreate,
-  KomunitasAddActivity,
-  Komunitas,
-} from "_views"
+import { MakComblang } from "_views"
 import StackOptions from "_routers/config/StackOptions"
-import Tabs from "./Tabs"
 import { Colors } from "_styles"
 
 const Stack = createStackNavigator()
 const initParams = {
-  customBg: Colors.brandKomunitas,
+  customBg: Colors.brandMakcomblang,
   customColor: Colors.themeLight,
 }
 
-const KomunitasStack = () => (
+const MakComblangStack = () => (
   <Stack.Navigator {...StackOptions}>
     <Stack.Screen
-      name="komunitas/landing"
-      component={Tabs}
-      options={{ title: "Komunitas", headerShown: false }}
-      initialParams={initParams}
+      name="makcomblang/landing"
+      component={MakComblang.Landing}
+      options={{ title: "Mak Comblang" }}
+      initialParams={{ withGoBack: true, ...initParams }}
     />
     <Stack.Screen
-      name="komunitas/detail"
-      component={Komunitas.Detail}
+      name="makcomblang/detail"
+      component={MakComblang.Detail}
       options={({ route }) => ({ title: route.params.title })}
       initialParams={initParams}
     />
 
-    <Stack.Screen
-      name="komunitas/edit-form"
+    {/* <Stack.Screen
+      name="makcomblang/edit-form"
       component={Komunitas.EditForm}
       options={({ navigation, route }) => ({
         title: route.params?.isEditing ? "Edit Komunitas" : "Buat Komunitas",
       })}
-      initialParams={initParams}
     />
 
     <Stack.Screen
-      name="komunitas/add-activity"
+      name="makcomblang/add-activity"
       component={Komunitas.AddActivity}
       options={({ route }) => ({ title: route.params.routeTitle })}
-      initialParams={initParams}
-    />
+    /> */}
   </Stack.Navigator>
 )
 
-export default KomunitasStack
+export default MakComblangStack

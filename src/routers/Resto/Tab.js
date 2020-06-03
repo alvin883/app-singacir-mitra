@@ -9,16 +9,22 @@ import PesananTab from "./PesananTab"
 import { Resto } from "_views"
 import { createStackNavigator } from "@react-navigation/stack"
 import StackOptions from "_routers/config/StackOptions"
+import { Colors } from "_styles"
 
 const RNTab = createBottomTabNavigator()
-
 const Stack = createStackNavigator()
+const initParams = {
+  customBg: Colors.brandResto,
+  customColor: Colors.themeLight,
+}
+
 const HistoryStack = () => (
   <Stack.Navigator {...StackOptions}>
     <Stack.Screen
       name="resto/history/landing"
       component={Resto.History}
       options={{ title: "History Pesanan" }}
+      initialParams={initParams}
     />
   </Stack.Navigator>
 )

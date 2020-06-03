@@ -13,26 +13,22 @@ import { Spaces, Colors } from "_styles"
 import { IconName } from "_c_a_icons"
 import { sample, navigationServices } from "_utils"
 import { BlockList } from "_organisms"
-import IllustrationCommunity from "_assets/images/illustration-community.png"
+import IllustrationMakcomblang from "_assets/images/illustration-makcomblang.png"
 import { useFocusEffect } from "@react-navigation/native"
 
-const gotoCommunity = ({ id, title }) => {
-  console.log("KomunitasLanding - gotoCommunity: ", id, title)
-  navigationServices.Navigate("komunitas/detail", {
+const gotoDetail = ({ id, title }) => {
+  console.log("MakComblangLanding - gotoDetail: ", id, title)
+  navigationServices.Navigate("makcomblang/detail", {
     title: title,
     community_id: id,
     community_name: title,
   })
 }
 
-const gotoCreate = () => {
-  navigationServices.Navigate("komunitas/edit-form")
-}
-
 const Landing = () => {
   useFocusEffect(
     useCallback(() => {
-      StatusBar.setBackgroundColor(Colors.brandKomunitas)
+      StatusBar.setBackgroundColor(Colors.brandMakcomblang)
       StatusBar.setBarStyle("light-content")
     }, []),
   )
@@ -42,30 +38,23 @@ const Landing = () => {
       <View style={styles.hero}>
         <View style={styles.heroBg} />
 
-        <Image source={IllustrationCommunity} style={styles.image} />
-
-        <Button
-          style={styles.create}
-          text="Buat Komunitas"
-          iconName={IconName.chevronRight}
-          iconPosition="right"
-          onPress={gotoCreate}
-        />
+        <Image source={IllustrationMakcomblang} style={styles.image} />
       </View>
 
       <View style={styles.bottom}>
         <Button
           style={styles.search}
           type="secondary"
-          text="Cari komunitas"
+          text="Cari mak comblang"
           iconName={IconName.chevronRight}
           iconPosition="right"
         />
 
         <BlockList
           itemFirstStyle={{ marginTop: 24 }}
-          list={sample.KomunitasList}
-          onItemPress={gotoCommunity}
+          list={sample.MakcomblangList}
+          onItemPress={gotoDetail}
+          type="makcomblang"
         />
       </View>
     </ScrollView>
@@ -75,6 +64,7 @@ const Landing = () => {
 const styles = StyleSheet.create({
   hero: {
     paddingTop: 30,
+    paddingBottom: 30,
     paddingHorizontal: Spaces.container,
   },
   heroBg: {

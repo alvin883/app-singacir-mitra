@@ -3,7 +3,14 @@ import { StyleSheet, ViewPropTypes } from "react-native"
 import PropTypes from "prop-types"
 import { BlockItem } from "_molecules"
 
-const BlockList = ({ list, itemStyle, itemFirstStyle, onItemPress }) =>
+const BlockList = ({
+  list,
+  itemStyle,
+  itemFirstStyle,
+  onItemPress,
+  type,
+  makcomblangOwner,
+}) =>
   list.map((item, index) => {
     const isFirst = index === 0
     const _style = { ...styles.item, ...itemStyle }
@@ -20,20 +27,14 @@ const BlockList = ({ list, itemStyle, itemFirstStyle, onItemPress }) =>
         distance={item.distance}
         rating={item.rating}
         onPress={() => onItemPress({ id: item.id, title: item.name })}
+        type={type}
+        makcomblangOwner={item.owner}
       />
     )
   })
 
-BlockList.propTypes = {
-  list: PropTypes.array,
-  itemStyle: ViewPropTypes.style,
-  itemFirstStyle: ViewPropTypes.style,
-  onItemPress: PropTypes.func.isRequired,
-}
-
-BlockList.defaultProps = {
-  onItemPress: ({ id, title }) => {},
-}
+BlockList.propTypes = BlockItem.propTypes
+BlockList.defaultProps = BlockItem.defaultProps
 
 const styles = StyleSheet.create({
   item: {

@@ -15,4 +15,12 @@ export default {
   // Brand Colors
   brandPrimary: "#FF9316",
   brandSecondary: "#2F80ED",
+  // brandPurple: "#b23f91",
+  brandPurple: "#9A43DF",
+  brandResto: "#31b057",
+  brandPedagang: "#31b057",
+  brandWarung: "#fc8338",
+  brandKomunitas: "#2F80ED",
+  brandMakcomblang: "#D93838",
+  brandMotoris: "#FF9316",
 }

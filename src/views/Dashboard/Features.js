@@ -35,13 +35,6 @@ const RenderButtons = ({ items }) => {
 
 const Features = ({ authRole }) => {
   let items = []
-  let itemsDefault = [
-    {
-      name: "Komunitas",
-      iconName: IconName.people,
-      link: "komunitas",
-    },
-  ]
 
   if (authRole === role.RESTO) {
     items.push({
@@ -69,7 +62,17 @@ const Features = ({ authRole }) => {
     })
   }
 
-  items = [...items, ...itemsDefault]
+  items.push({
+    name: "Komunitas",
+    iconName: IconName.people,
+    link: "komunitas",
+  })
+
+  items.push({
+    name: "Mak Comblang",
+    iconName: IconName.hand,
+    link: "makcomblang",
+  })
 
   return (
     <View style={styles.container}>

@@ -1,8 +1,15 @@
-import React, { Component, useState } from "react"
-import { View, StyleSheet, ScrollView, YellowBox } from "react-native"
+import React, { Component, useState, useCallback } from "react"
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  YellowBox,
+  StatusBar,
+} from "react-native"
 import PropTypes from "prop-types"
 import { Spaces } from "_styles"
 import { Input, InputPhoto, Button } from "_atoms"
+import { useFocusEffect } from "@react-navigation/native"
 
 const AddActivity = ({ navigation, route }) => {
   /**
@@ -30,9 +37,16 @@ const AddActivity = ({ navigation, route }) => {
    *
    * @link https://reactnavigation.org/docs/troubleshooting/#i-get-the-warning-non-serializable-values-were-found-in-the-navigation-state
    */
-  YellowBox.ignoreWarnings([
-    "Non-serializable values were found in the navigation state",
-  ])
+  // YellowBox.ignoreWarnings([
+  //   "Non-serializable values were found in the navigation state",
+  // ])
+
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     StatusBar.setBackgroundColor(Colors.brandKomunitas)
+  //     StatusBar.setBarStyle("light-content")
+  //   }, []),
+  // )
 
   return (
     <ScrollView>

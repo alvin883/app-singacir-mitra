@@ -16,7 +16,7 @@ const Header = ({ style }) => {
 
   return (
     <View style={{ ...styles.box, ...style }}>
-      <Text style={styles.brand}>Si Ngacir</Text>
+      <Text style={styles.brand}>Si Ngacir RezekiKu</Text>
       <TouchableOpacity
         activeOpacity={0.8}
         onPress={() => navigationServices.Navigate("profile")}>

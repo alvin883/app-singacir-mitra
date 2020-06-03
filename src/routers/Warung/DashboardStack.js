@@ -14,8 +14,13 @@ import StackOptions from "_routers/config/StackOptions"
 import DashboardMenuStack from "./DashboardMenuStack"
 import IllustrationWaiting from "_assets/images/illustration-waiting.png"
 import { navigationServices } from "_utils"
+import { Colors } from "_styles"
 
 const Stack = createStackNavigator()
+const initParams = {
+  customBg: Colors.brandWarung,
+  customColor: Colors.themeLight,
+}
 
 const DashboardStack = () => {
   const submitProsesWithdraw = () => {
@@ -31,37 +36,44 @@ const DashboardStack = () => {
         initialParams={{
           withGoBack: true,
           customBackAction: () => navigationServices.GoBack(),
+          ...initParams,
         }}
       />
       <Stack.Screen
         name="warung/dashboard/profil"
         component={Warung.Profile}
         options={{ title: "Profil Warung" }}
+        initialParams={initParams}
       />
       <Stack.Screen
         name="warung/dashboard/pemilik"
         component={Warung.DataPribadi}
         options={{ title: "Data Pribadi" }}
+        initialParams={initParams}
       />
       <Stack.Screen
         name="warung/dashboard/alamat"
         component={Warung.Alamat}
         options={{ title: "Alamat" }}
+        initialParams={initParams}
       />
       <Stack.Screen
         name="warung/dashboard/edit-alamat"
         component={Warung.AlamatSingle}
         options={{ title: "Alamat" }}
+        initialParams={initParams}
       />
       <Stack.Screen
         name="warung/dashboard/set-pin-map"
         component={PinMap}
         options={{ title: "Pin Maps" }}
+        initialParams={initParams}
       />
       <Stack.Screen
         name="warung/dashboard/jadwal"
         component={Warung.Jadwal}
         options={{ title: "Jam Operasional" }}
+        initialParams={initParams}
       />
       <Stack.Screen
         name="warung/dashboard/edit-jadwal"
@@ -69,26 +81,31 @@ const DashboardStack = () => {
         options={({ navigation, route }) => ({
           title: `Jadwal: ${route.params.dayName}`,
         })}
+        initialParams={initParams}
       />
       <Stack.Screen
         name="warung/dashboard/menu"
         options={{ title: "Menu" }}
         component={DashboardMenuStack}
+        initialParams={initParams}
       />
       <Stack.Screen
         name="warung/dashboard/form-menu"
         component={Warung.MenuForm}
         options={{ title: "Tambah Menu" }}
+        initialParams={initParams}
       />
       <Stack.Screen
         name="warung/dashboard/edit-promo"
         component={EditMenuDiscount}
         options={{ title: "Harga Promo" }}
+        initialParams={initParams}
       />
       <Stack.Screen
         name="warung/dashboard/withdraw"
         component={Warung.CairkanSaldo}
         options={{ title: "Cairkan Saldo" }}
+        initialParams={initParams}
       />
       <Stack.Screen
         name="warung/dashboard/otp-withdraw"
@@ -96,6 +113,7 @@ const DashboardStack = () => {
         options={{ title: "Verifikasi OTP" }}
         initialParams={{
           navigateRouteName: "warung/dashboard/proses-withdraw",
+          ...initParams,
         }}
       />
       <Stack.Screen
@@ -113,6 +131,8 @@ const DashboardStack = () => {
 
           // Parameter for StackOptions
           customBackAction: submitProsesWithdraw,
+
+          ...initParams,
         }}
       />
       <Stack.Screen

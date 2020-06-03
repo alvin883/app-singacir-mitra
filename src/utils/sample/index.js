@@ -7,6 +7,7 @@ import RestoProfile from "./RestoProfile"
 import RestoMenu from "./RestoMenu"
 import RestoProfileAPI from "./RestoProfileAPI"
 import ScheduleAPI from "./ScheduleAPI"
+import MakcomblangList from "./MakcomblangList"
 
 export default {
   RestoList,
@@ -18,4 +19,5 @@ export default {
   RestoMenu,
   RestoProfileAPI,
   ScheduleAPI,
+  MakcomblangList,
 }

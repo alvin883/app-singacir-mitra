@@ -20,13 +20,14 @@ const headerLeft = ({ canGoBack, navigation, route }) => {
    * Custom function when user click back button
    */
   const isCustomBackAction = route.params && route.params.customBackAction
+  const customBaseColor = route.params?.customColor
 
   if (isWithButton) {
     return (
       <Button
         size="small"
         type="nude"
-        baseColor={Colors.themeDark}
+        baseColor={customBaseColor ? customBaseColor : Colors.themeDark}
         iconName={IconName.arrowLeft}
         onPress={() => {
           if (isCustomBackAction) {
@@ -43,15 +44,30 @@ const headerLeft = ({ canGoBack, navigation, route }) => {
 }
 
 const StackOptions = {
-  screenOptions: ({ navigation, route }) => ({
-    headerStyle: styles.header,
-    headerTitleStyle: styles.title,
-    headerTitleContainerStyle: styles.titleContainer,
-    headerLeft: ({ canGoBack }) => headerLeft({ canGoBack, navigation, route }),
-    headerLeftContainerStyle: styles.containerLeft,
-    cardStyleInterpolator: CardStyleInterpolators.forScaleFromCenterAndroid,
-    ...TransitionPresets.SlideFromRightIOS,
-  }),
+  screenOptions: ({ navigation, route }) => {
+    console.log(route?.params, route)
+
+    return {
+      headerStyle: {
+        ...styles.header,
+        ...(route.params?.customBg
+          ? { backgroundColor: route.params.customBg }
+          : {}),
+      },
+      headerTitleStyle: {
+        ...styles.title,
+        ...(route.params?.customColor
+          ? { color: route.params.customColor }
+          : {}),
+      },
+      headerTitleContainerStyle: styles.titleContainer,
+      headerLeft: ({ canGoBack }) =>
+        headerLeft({ canGoBack, navigation, route }),
+      headerLeftContainerStyle: styles.containerLeft,
+      cardStyleInterpolator: CardStyleInterpolators.forScaleFromCenterAndroid,
+      ...TransitionPresets.SlideFromRightIOS,
+    }
+  },
 }
 
 /**
@@ -66,6 +82,7 @@ const styles = StyleSheet.create({
   header: {
     height: 67,
     backgroundColor: Colors.themeLight,
+    // backgroundColor: "red",
   },
   containerLeft: {
     padding: 0,

@@ -5,9 +5,14 @@ import { IconName } from "_c_a_icons"
 import { createStackNavigator } from "@react-navigation/stack"
 import StackOptions from "_routers/config/StackOptions"
 import TabOptions from "_routers/config/TabOptions"
+import { Colors } from "_styles"
 
 const Tab = createBottomTabNavigator()
 const Stack = createStackNavigator()
+const initParams = {
+  customBg: Colors.brandKomunitas,
+  customColor: Colors.themeLight,
+}
 
 const Tabs = () => (
   <Tab.Navigator {...TabOptions} backBehavior="initialRoute">
@@ -37,7 +42,7 @@ const KomunitasLanding = () => (
       name="komunitas/landing"
       component={Komunitas.Landing}
       options={{ title: "Komunitas" }}
-      initialParams={{ withGoBack: true }}
+      initialParams={{ withGoBack: true, ...initParams }}
     />
   </Stack.Navigator>
 )
@@ -48,7 +53,10 @@ const KomunitasMine = () => (
       name="komunitas/mine"
       component={Komunitas.Mine}
       options={{ title: "Komunitas" }}
-      initialParams={{ withGoBack: true }}
+      initialParams={{
+        withGoBack: true,
+        ...initParams,
+      }}
     />
   </Stack.Navigator>
 )

@@ -10,8 +10,13 @@ import { Pedagang } from "_views"
 import { createStackNavigator } from "@react-navigation/stack"
 import StackOptions from "_routers/config/StackOptions"
 import { navigationServices } from "_utils"
+import { Colors } from "_styles"
 
 const RNTab = createBottomTabNavigator()
+const initParams = {
+  customBg: Colors.brandPedagang,
+  customColor: Colors.themeLight,
+}
 
 const Stack = createStackNavigator()
 const HistoryStack = () => (
@@ -20,6 +25,7 @@ const HistoryStack = () => (
       name="pedagang/history/landing"
       component={Pedagang.History}
       options={{ title: "History Pesanan" }}
+      initialParams={initParams}
     />
   </Stack.Navigator>
 )

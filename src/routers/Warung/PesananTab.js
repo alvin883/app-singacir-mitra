@@ -9,9 +9,14 @@ import { IconName } from "_c_a_icons"
 import StackOptions from "_routers/config/StackOptions"
 import { navigationServices } from "_utils"
 import { Warung } from "_views"
+import { Colors } from "_styles"
 
 const Stack = createStackNavigator()
 const RNTab = createMaterialTopTabNavigator()
+const initParams = {
+  customBg: Colors.brandWarung,
+  customColor: Colors.themeLight,
+}
 
 const Tab = () => (
   <RNTab.Navigator {...MaterialTopTabOptions} backBehavior="initialRoute">
@@ -34,6 +39,7 @@ const PesananTab = () => (
       name="warung/pesanan"
       component={Tab}
       options={{ title: "Pesanan" }}
+      initialParams={initParams}
       //   initialParams={{
       //     withGoBack: true,
       //     customBackAction: () => navigationServices.GoBack(),

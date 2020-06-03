@@ -15,6 +15,8 @@ const BlockItem = ({
   rating,
   style,
   onPress,
+  type,
+  makcomblangOwner,
 }) => {
   return (
     <TouchableOpacity
@@ -31,20 +33,32 @@ const BlockItem = ({
         <Text style={styles.rightTitle} weight="bold" numberOfLines={1}>
           {name}
         </Text>
-        <Content style={styles.rightAddress} numberOfLines={2}>
-          {address}
-        </Content>
+
+        {type === "default" && (
+          <Content style={styles.rightAddress} numberOfLines={2}>
+            {address}
+          </Content>
+        )}
+
+        {type === "makcomblang" && (
+          <Content style={styles.rightAddress} numberOfLines={2}>
+            {makcomblangOwner}
+          </Content>
+        )}
+
         <View style={styles.rightBottom}>
-          <View style={styles.rightBottomLeft}>
-            <Icon
-              name={IconName.clockOutline}
-              style={styles.rightBottomIcon}
-              color={hexToRgb(Colors.textPrimary, 0.8)}
-            />
-            <Content style={styles.rightBottomText}>
-              {time} - {distance}
-            </Content>
-          </View>
+          {type === "default" && time && distance && (
+            <View style={styles.rightBottomLeft}>
+              <Icon
+                name={IconName.clockOutline}
+                style={styles.rightBottomIcon}
+                color={hexToRgb(Colors.textPrimary, 0.8)}
+              />
+              <Content style={styles.rightBottomText}>
+                {time} - {distance}
+              </Content>
+            </View>
+          )}
           <RatingDisplay style={styles.rating} rating={rating} size="small" />
         </View>
       </View>
@@ -53,18 +67,21 @@ const BlockItem = ({
 }
 
 BlockItem.propTypes = {
-  image: sourcePropType,
-  name: PropTypes.string.isRequired,
+  image: ImageWithFallback.propTypes.source,
+  name: PropTypes.string,
   address: PropTypes.string,
   time: PropTypes.string,
   distance: PropTypes.string,
   rating: PropTypes.number,
   style: ViewPropTypes.style,
   onPress: PropTypes.func.isRequired,
+  type: PropTypes.oneOf(["default", "makcomblang"]),
+  makcomblangOwner: PropTypes.string,
 }
 
 BlockItem.defaultProps = {
   onPress: () => {},
+  type: "default",
 }
 
 const styles = StyleSheet.create({

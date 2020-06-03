@@ -5,33 +5,47 @@ import { Text, Button } from "_atoms"
 import { Spaces, Colors, FontSizes } from "_styles"
 import { convertToCurrency } from "_utils"
 
-const HistoryDateItem = ({ id, type, amount, status, time, withoutBorder }) => {
+const HistoryDateItem = ({
+  id,
+  type,
+  amount,
+  status,
+  time,
+  withoutBorder,
+  withCopy,
+}) => {
   return (
     <View
       style={{
         ...styles.wrapper,
         borderBottomWidth: withoutBorder ? 0 : 1,
       }}>
-      <View style={styles.header}>
-        <Text style={styles.type} size="small">
-          {type}
-        </Text>
-        <Text style={styles.status} size="small">
-          {status}
-        </Text>
-      </View>
+      {type && status ? (
+        <View style={styles.header}>
+          <Text style={styles.type} size="small">
+            {type}
+          </Text>
+          <Text style={styles.status} size="small">
+            {status}
+          </Text>
+        </View>
+      ) : null}
+
       <View style={styles.body}>
         <View style={styles.bodyLeft}>
           <Text style={styles.id} weight="bold">
             {id}
           </Text>
-          <Button
-            style={styles.idCopy}
-            textStyle={styles.idCopyText}
-            type="secondary"
-            size="small"
-            text="Copy"
-          />
+
+          {withCopy ? (
+            <Button
+              style={styles.idCopy}
+              textStyle={styles.idCopyText}
+              type="secondary"
+              size="small"
+              text="Copy"
+            />
+          ) : null}
         </View>
         <Text style={styles.amount} weight="bold">
           Rp {convertToCurrency(amount)}
@@ -51,10 +65,12 @@ HistoryDateItem.propTypes = {
   status: PropTypes.string,
   time: PropTypes.string,
   withoutBorder: PropTypes.bool,
+  withCopy: PropTypes.bool,
 }
 
 HistoryDateItem.defaultProps = {
   withoutBorder: false,
+  withCopy: true,
 }
 
 const styles = StyleSheet.create({

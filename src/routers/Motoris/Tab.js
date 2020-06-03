@@ -7,16 +7,22 @@ import { Motoris } from "_views"
 import { createStackNavigator } from "@react-navigation/stack"
 import StackOptions from "_routers/config/StackOptions"
 import { navigationServices } from "_utils"
+import { Colors } from "_styles"
 
 const RNTab = createBottomTabNavigator()
-
 const Stack = createStackNavigator()
+const initParams = {
+  customBg: Colors.brandMotoris,
+  customColor: Colors.themeLight,
+}
+
 const HistoryStack = () => (
   <Stack.Navigator {...StackOptions}>
     <Stack.Screen
       name="motoris/history/landing"
       component={Motoris.History}
       options={{ title: "History Pengantaran" }}
+      initialParams={initParams}
     />
   </Stack.Navigator>
 )

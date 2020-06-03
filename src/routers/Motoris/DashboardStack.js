@@ -4,8 +4,13 @@ import { OTP, Success, Motoris } from "_views"
 import StackOptions from "_routers/config/StackOptions"
 import IllustrationWaiting from "_assets/images/illustration-waiting.png"
 import { navigationServices } from "_utils"
+import { Colors } from "_styles"
 
 const Stack = createStackNavigator()
+const initParams = {
+  customBg: Colors.brandMotoris,
+  customColor: Colors.themeLight,
+}
 
 const DashboardStack = () => {
   const submitProsesWithdraw = () => {
@@ -21,22 +26,26 @@ const DashboardStack = () => {
         initialParams={{
           withGoBack: true,
           customBackAction: () => navigationServices.GoBack(),
+          ...initParams,
         }}
       />
       <Stack.Screen
         name="motoris/dashboard/profil"
         component={Motoris.Profile}
         options={{ title: "Profil Motoris" }}
+        initialParams={initParams}
       />
       <Stack.Screen
         name="motoris/dashboard/daftar-kiriman"
         component={Motoris.DaftarKiriman}
         options={{ title: "Daftar Kiriman" }}
+        initialParams={initParams}
       />
       <Stack.Screen
         name="motoris/dashboard/withdraw"
         component={Motoris.CairkanSaldo}
         options={{ title: "Cairkan Saldo" }}
+        initialParams={initParams}
       />
       <Stack.Screen
         name="motoris/dashboard/otp-withdraw"
@@ -44,6 +53,7 @@ const DashboardStack = () => {
         options={{ title: "Verifikasi OTP" }}
         initialParams={{
           navigateRouteName: "motoris/dashboard/proses-withdraw",
+          ...initParams,
         }}
       />
       <Stack.Screen
@@ -61,6 +71,8 @@ const DashboardStack = () => {
 
           // Parameter for StackOptions
           customBackAction: submitProsesWithdraw,
+
+          ...initParams,
         }}
       />
     </Stack.Navigator>

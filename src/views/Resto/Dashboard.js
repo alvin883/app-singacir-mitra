@@ -1,19 +1,28 @@
-import React from "react"
+import React, { useCallback } from "react"
 import {
   View,
   StyleSheet,
   TouchableOpacity,
   TouchableNativeFeedback,
   Dimensions,
+  StatusBar,
 } from "react-native"
 import PropTypes from "prop-types"
 import { Text, Divider, Button } from "_atoms"
 import { Spaces, Colors } from "_styles"
 import { Icon, IconName } from "_c_a_icons"
 import { hexToRgb, navigationServices } from "_utils"
+import { useFocusEffect } from "@react-navigation/native"
 
 const DashboardButton = ({ iconName, text, onPress }) => {
   const rippleColor = hexToRgb(Colors.brandPrimary, 0.1)
+
+  useFocusEffect(
+    useCallback(() => {
+      StatusBar.setBackgroundColor(Colors.brandResto)
+      StatusBar.setBarStyle("light-content")
+    }, []),
+  )
 
   return (
     <TouchableNativeFeedback
