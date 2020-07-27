@@ -1,53 +1,135 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState, useCallback } from "react"
 import { StepProfile } from "./Setup"
-import { View, StyleSheet, ScrollView, ActivityIndicator } from "react-native"
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  ActivityIndicator,
+  Alert,
+} from "react-native"
 import { Spaces, Colors } from "_styles"
-import { sample, navigationServices } from "_utils"
+import { sample, navigationServices, asyncHandle } from "_utils"
+import { useSelector } from "react-redux"
+import axios from "axios"
+import { LoadingView, FormMerchantData } from "_organisms"
+import { useFocusEffect } from "@react-navigation/native"
+import TextData from "./TextData"
 
 const Profile = () => {
   const [data, setData] = useState()
-  const [isLoading, setLoading] = useState(true)
+  const [isLoading, setLoading] = useState(false)
+  const [isFetching, setFetching] = useState(true)
+  const [originalData, setOriginalData] = useState(null)
+  const authState = useSelector(state => state.authReducer)
+  const token = authState.token
+  const mitraId = authState.mitraId
 
-  const onSubmit = data => {
-    setData(data)
-    console.log("onSubmit, data: ", data)
-
-    // TODO: API call
-    setTimeout(() => {
-      navigationServices.GoBack()
-    }, 1000)
+  const errorHandler = (
+    err,
+    titleLog = "Steps Error",
+    errorCodeLog = "",
+    message = "Terjadi kesalahan, silahkan coba beberapa saat lagi",
+  ) => {
+    console.log(titleLog, err)
+    console.log(titleLog, err?.response?.data)
+    alert(`${message}${errorCodeLog ? `\n\ncodeError: ${errorCodeLog}` : ``}`)
+    setLoading(false)
+    navigationServices.GoBack()
+    return false
   }
 
-  useEffect(() => {
-    let isMounted = true
+  const onSubmit = async data => {
+    setLoading(true)
+    const updateCoverPhoto = data.coverPhoto != originalData.coverPhoto
 
-    // TODO: API call
-    setTimeout(() => {
-      console.log("useEffect, isMounted: ", isMounted)
+    let apiData, apiParams, apiPromise, apiRes, apiErr
+    let uploadedImageURL = data.coverPhoto
 
-      if (isMounted) {
-        // Example
-        setData(sample.RestoProfile)
-        setLoading(false)
-      }
-    }, 775)
-
-    // To prevent update in unmounted component
-    return () => {
-      isMounted = false
+    if (updateCoverPhoto) {
+      // Upload and update cover image
+      apiData = new FormData()
+      apiData.append("image", {
+        uri: dataProfile.coverPhoto.uri,
+        name: "warungCoverPhoto.jpg",
+        type: "image/jpeg",
+      })
+      apiPromise = axios.post("uploadimage/warung", apiData)
+      ;[apiRes, apiErr] = await asyncHandle(apiPromise)
+      if (apiErr) return errorHandler(apiErr, "photoErr", "photo-1")
+      uploadedImageURL = apiRes.data.image_url
     }
-  }, [])
 
-  return isLoading ? (
-    <View style={styles.wrapperLoading}>
-      <ActivityIndicator color={Colors.brandPrimary} size="large" />
-    </View>
-  ) : (
+    // Update profile
+    apiParams = { params: { mitraId: mitraId } }
+    apiData = {
+      name: data.name,
+      description: data.description,
+      email: data.email,
+      warungCategory: data.category,
+      phoneNumber: data.phoneNumber,
+      coverPict: uploadedImageURL,
+    }
+    apiPromise = axios.put(`warung/update/${data.id}`, apiData, apiParams)
+    ;[apiRes, apiErr] = await asyncHandle(apiPromise)
+    if (apiErr) return errorHandler(apiErr, "updateErr", "update-1")
+    console.log("apires-PUT", apiRes.data)
+
+    Alert.alert("Sukses", "Warung anda berhasil di perbaharui", [
+      {
+        text: "Oke",
+        onPress: navigationServices.GoBack(),
+      },
+    ])
+  }
+
+  const fetchProfile = async () => {
+    let apiPromise, apiRes, apiErr
+
+    // Get warungId
+    apiPromise = axios.get("mitras/showMitra", { params: { mitraId: mitraId } })
+    ;[apiRes, apiErr] = await asyncHandle(apiPromise)
+    if (apiErr) return errorHandler(apiErr, "showMitraErr", "mitra-1")
+    const warungId = apiRes.data.data.Warung.id
+
+    // Warung Profile
+    apiPromise = axios.get("warung/showWarungProfile", {
+      params: { warungId: warungId },
+    })
+    ;[apiRes, apiErr] = await asyncHandle(apiPromise)
+    if (apiErr) return errorHandler(apiErr, "fetchWarungErr", "fetch-1")
+    const profile = apiRes.data.data.warung
+
+    const dataMapping = {
+      id: profile.id,
+      name: profile.name,
+      description: profile.description,
+      email: profile.email,
+      category: profile.warungCategory,
+      phoneNumber: profile.phoneNumber,
+      coverPhoto: profile.coverPict,
+    }
+
+    setOriginalData(dataMapping)
+    setData(dataMapping)
+    setFetching(false)
+  }
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchProfile()
+    }, []),
+  )
+
+  if (isFetching) return <LoadingView />
+
+  return (
     <ScrollView>
       <View style={styles.wrapper}>
-        <StepProfile
+        <FormMerchantData
           data={data}
+          text={TextData.FormMerchantDataText}
           isFirstSetup={false}
+          isLoading={isLoading}
           onValidSubmit={onSubmit}
         />
       </View>

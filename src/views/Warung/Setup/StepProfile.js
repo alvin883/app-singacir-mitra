@@ -116,7 +116,7 @@ StepProfile.propTypes = {
     email: PropTypes.string,
     category: PropTypes.string,
     phoneNumber: PropTypes.string,
-    coverPhoto: customPropTypes.imageSource,
+    coverPhoto: InputPhoto.propTypes.source,
   }),
   isFirstSetup: PropTypes.bool,
 }

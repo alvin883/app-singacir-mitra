@@ -12,12 +12,16 @@ const MenuTersedia = ({ navigation, route }) => {
   const initMenuList = sample.RestoMenu
   const [menuList, setMenuList] = useState(initMenuList)
 
+  // TODO: fetch api
+  console.log("warungCategoryId", route.params.warungCategoryId)
+
   const onChangeAPI = () => {
     console.log("onChangeAPI - placeholder")
   }
 
   const clickAddMenu = () =>
     navigationServices.Navigate("warung/dashboard/form-menu", {
+      warungCategoryId: route.params.warungCategoryId,
       onValidSubmit: data => {
         let newMenuList = [...menuList, data]
 

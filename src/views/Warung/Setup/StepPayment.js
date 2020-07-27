@@ -106,7 +106,7 @@ const StepPayment = ({ onValidSubmit, onBackData, data: defaultVal }) => {
       <Button
         style={styles.submit}
         size="large"
-        text="Submit"
+        text="Selanjutnya"
         onPress={onSubmit}
         state={isLoading ? "loading" : "default"}
       />

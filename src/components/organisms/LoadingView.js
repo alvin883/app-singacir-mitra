@@ -3,9 +3,9 @@ import PropTypes from "prop-types"
 import { View, StyleSheet, ActivityIndicator } from "react-native"
 import { Colors } from "_styles"
 
-const LoadingView = () => {
+const LoadingView = ({ style }) => {
   return (
-    <View style={styles.wrapper}>
+    <View style={{ ...styles.wrapper, ...style }}>
       <ActivityIndicator color={Colors.brandPrimary} size="large" />
     </View>
   )

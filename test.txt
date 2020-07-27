@@ -1,0 +1,57 @@
+pass : ngacirexpress
+
+
+user : alvinnovian883@gmail.com
+role : resto
+id   : 1
+token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtaXRyYUlkIjoxLCJmdWxsbmFtZSI6ImFsdmluIG1pdHJhIiwiZW1haWwiOiJhbHZpbm5vdmlhbjg4M0BnbWFpbC5jb20iLCJpYXQiOjE1OTQ1NDA4NDF9.HQzMRnkdar8KaqRCLFc5EJcv8HLONihEcx2QpdQzBnI
+
+
+user : alvinnovian883+1@gmail.com
+role : resto
+id   : 2
+token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtaXRyYUlkIjoyLCJmdWxsbmFtZSI6ImFsdmluIG1pdHJhIiwiZW1haWwiOiJhbHZpbm5vdmlhbjg4MysxQGdtYWlsLmNvbSIsImlhdCI6MTU5NDkxMTcxMX0.lr9e_v2vKvOcisAj37pePM__8j6uaU6toQxP4Gu8nAY
+
+
+user : alvinnovian883+2@gmail.com
+role : resto
+id   : 3
+resto: 13
+token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtaXRyYUlkIjozLCJmdWxsbmFtZSI6ImFsdmluIG1pdHJhIiwiZW1haWwiOiJhbHZpbm5vdmlhbjg4MysyQGdtYWlsLmNvbSIsImlhdCI6MTU5NDkxMTQwMX0.dlLtOEY450U8ODxOfykvTG_EkvPjpF6M7srQW9X745s
+
+
+user : alvinnovian883+3@gmail.com
+role : warung
+id   : 4
+token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtaXRyYUlkIjo0LCJmdWxsbmFtZSI6ImFsdmluIG1pdHJhIiwiZW1haWwiOiJhbHZpbm5vdmlhbjg4MyszQGdtYWlsLmNvbSIsImlhdCI6MTU5NDkxMTUzOX0.0SpborlnXMSjBuASmON7vlj8oPupZhf4XPfFt5Rq4H8
+
+
+// 5 ?
+
+
+user : alvinnovian883+testoperation@gmail.com
+role : driver
+id   : 6
+token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtaXRyYUlkIjo2LCJmdWxsbmFtZSI6ImFsdmluIG1pdHJhIiwiZW1haWwiOiJhbHZpbm5vdmlhbjg4Myt0ZXN0b3BlcmF0aW9uQGdtYWlsLmNvbSIsImlhdCI6MTU5NTA4Mzg0NX0.HwoFAPDe1Er-690K0kiBoHNnChwajeMkeY4hGWPg6Co
+
+
+user : alvinnovian883+test2@gmail.com
+
+
+
+user : alvinnovian883+restooperation@gmail.com
+role : driver
+id   : 7
+token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtaXRyYUlkIjo3LCJmdWxsbmFtZSI6ImFsdmluIG1pdHJhIiwiZW1haWwiOiJhbHZpbm5vdmlhbjg4MytyZXN0b29wZXJhdGlvbkBnbWFpbC5jb20iLCJpYXQiOjE1OTUwODQxMTZ9.rbrTfRbbVN3EqciYprYuxgbB_SdjRLiaKEjbpfZeNX0
+
+
+user : alvinnovian883+restooperation1@gmail.com
+role : resto
+id   : 8
+token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtaXRyYUlkIjo4LCJmdWxsbmFtZSI6ImFsdmluIG1pdHJhIiwiZW1haWwiOiJhbHZpbm5vdmlhbjg4MytyZXN0b29wZXJhdGlvbjFAZ21haWwuY29tIiwiaWF0IjoxNTk1MDg0MTI5fQ.E0zUyMvTb5kqCB5H4kvgvEjvs8KQpPIvPMbQZimY1LI
+
+
+user : alvinnovian883+testregister@gmail.com
+role : pedagang
+id   : 9
+token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtaXRyYUlkIjo5LCJmdWxsbmFtZSI6Im5hbWEiLCJlbWFpbCI6ImFsdmlubm92aWFuODgzK3Rlc3RyZWdpc3RlckBnbWFpbC5jb20iLCJpYXQiOjE1OTU2MTkzMjV9.UeM_Cq-M3tB7XpyIt1IdUwA3ObmrVgPsQMH2gu75fJw

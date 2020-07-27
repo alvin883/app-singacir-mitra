@@ -2,11 +2,22 @@ import { auth } from "_actions"
 
 const actionName = auth.actionName
 
+// const initState = {
+//   token: null,
+//   userId: null,
+//   username: null,
+//   role: null,
+//   hasSetup: false,
+//   hasApproved: false,
+// }
+
 const initState = {
-  token: null,
-  userId: null,
-  username: null,
+  mitraId: null,
+  fullname: null,
+  email: null,
   role: null,
+  iat: null,
+  token: null,
   hasSetup: false,
   hasApproved: false,
 }

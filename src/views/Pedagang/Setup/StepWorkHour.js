@@ -86,7 +86,7 @@ const StepWorkHour = ({ onValidSubmit }) => {
       <Button
         style={styles.submit}
         size="large"
-        text="Submit"
+        text="Simpan"
         onPress={() => onValidSubmit(schedule)}
       />
     </View>

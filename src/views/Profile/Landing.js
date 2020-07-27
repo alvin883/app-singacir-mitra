@@ -4,16 +4,26 @@ import PropTypes from "prop-types"
 import { Divider, Button } from "_atoms"
 import { ProfileHeader, ProfileButton, PairTitleValue } from "_molecules"
 import { Spaces, Colors } from "_styles"
-import { convertToCurrency, sample, navigationServices } from "_utils"
-import { useDispatch } from "react-redux"
+import {
+  convertToCurrency,
+  sample,
+  navigationServices,
+  asyncHandle,
+} from "_utils"
+import { useDispatch, useSelector } from "react-redux"
 import { auth } from "_actions"
 import AsyncStorage from "@react-native-community/async-storage"
 import { useFocusEffect } from "@react-navigation/native"
+import axios from "axios"
+import { role_api } from "../../types/role"
+import { LoadingView } from "_organisms"
 
 const Landing = () => {
   const dispatch = useDispatch()
-  const data = sample.Profile
-  const [isLoading, setIsLoading] = useState(false)
+  const [data, setData] = useState()
+  const [isLoading, setLoading] = useState(false)
+  const [isFetching, setFetching] = useState(true)
+  const mitraId = useSelector(state => state.authReducer.mitraId)
 
   const clickEdit = () => {
     if (isLoading) return false
@@ -41,23 +51,86 @@ const Landing = () => {
   }
 
   const clickLogout = () => {
-    setIsLoading(true)
+    setLoading(true)
 
-    AsyncStorage.removeItem("user")
+    AsyncStorage.removeItem("token")
       .then(() => dispatch(auth.logout(null)))
       .catch(err => {
-        setIsLoading(false)
+        setLoading(false)
         console.log(err)
         alert("Terjadi kesalahan saat logout, silahkan coba lagi")
       })
+  }
+
+  const errorHandler = (
+    err,
+    titleLog = "Steps Error",
+    errorCodeLog = "",
+    message = "Terjadi kesalahan, silahkan coba beberapa saat lagi",
+  ) => {
+    console.log(titleLog, err)
+    console.log(titleLog, err?.response?.data)
+    alert(`${message}${errorCodeLog ? `\n\ncodeError: ${errorCodeLog}` : ``}`)
+    setFetching(false)
+    navigationServices.GoBack()
+    return false
+  }
+
+  function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1)
+  }
+
+  const fetchData = async () => {
+    let apiPromise, apiRes, apiErr
+
+    // Mitra Profile Data
+    apiPromise = axios.get("mitras/showMitra", {
+      params: { mitraId: mitraId },
+    })
+    ;[apiRes, apiErr] = await asyncHandle(apiPromise)
+    if (apiErr) return errorHandler(apiErr, "FetchError", "fetch-1")
+    if (!apiRes?.data?.data) {
+      return errorHandler("error", "error", null, "Not Found")
+    }
+    const profile = apiRes.data.data
+
+    // Mitra Balance Data
+    apiPromise = axios.get("mitrabalance/showMitraBalance", {
+      params: { mitraId: mitraId },
+    })
+    ;[apiRes, apiErr] = await asyncHandle(apiPromise)
+    if (apiErr) return errorHandler(apiErr, "BalanceErr", "balance-1")
+    if (!apiRes?.data?.data) {
+      return errorHandler("error", "error", null, "Not Found")
+    }
+    const balance = apiRes.data.data
+
+    const dataMapping = {
+      name: profile.fullname,
+      role: capitalizeFirstLetter(role_api[profile.Business.id]),
+      // TODO:
+      image: null,
+      saldo: parseInt(balance.balance),
+      points: parseInt(balance.point),
+      // TODO:
+      donation: 0,
+      email: profile.email,
+      phoneNumber: profile.phoneNumber,
+    }
+
+    setData(dataMapping)
+    setFetching(false)
   }
 
   useFocusEffect(
     useCallback(() => {
       StatusBar.setBackgroundColor(Colors.themeLight)
       StatusBar.setBarStyle("dark-content")
+      fetchData()
     }, []),
   )
+
+  if (isFetching) return <LoadingView />
 
   return (
     <ScrollView>
@@ -75,7 +148,7 @@ const Landing = () => {
           <ProfileButton
             style={{ ...styles.profileButton, marginTop: 0 }}
             title="Kantong Semar"
-            value={"Rp " + convertToCurrency(data.saldo)}
+            value={"Rp " + convertToCurrency(data.saldo, 0, false)}
             actionText="History"
             onClick={clickSaldo}
             colorPreset="secondary"
@@ -84,7 +157,7 @@ const Landing = () => {
           <ProfileButton
             style={styles.profileButton}
             title="Points"
-            value={convertToCurrency(data.points)}
+            value={convertToCurrency(data.points, 0, false)}
             actionText="Donasi"
             onClick={clickPoint}
           />
@@ -92,7 +165,7 @@ const Landing = () => {
           <ProfileButton
             style={styles.profileButton}
             title="Total Donasi Anda"
-            value={convertToCurrency(data.donation)}
+            value={convertToCurrency(data.donation, 0, false)}
             actionText="History"
             onClick={clickDonation}
           />

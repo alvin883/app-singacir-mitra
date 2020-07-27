@@ -111,8 +111,8 @@ const Dashboard = () => {
       />
       <DashboardButton
         iconName={IconName.menu}
-        text="Menu"
-        onPress={() => navigationServices.Navigate("warung/dashboard/menu")}
+        text="Produk"
+        onPress={() => navigationServices.Navigate("warung/dashboard/category")}
       />
       <DashboardButton
         iconName={IconName.money}

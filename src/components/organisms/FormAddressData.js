@@ -1,17 +1,34 @@
 import React, { useRef, useState } from "react"
 import { View, StyleSheet, Dimensions } from "react-native"
 import PropTypes from "prop-types"
-import { Heading, Input, Button, InputLabel } from "_atoms"
-import { customPropTypes, navigationServices } from "_utils"
+import { Heading, Input, Button, InputLabel, Infobox } from "_atoms"
+import {
+  customPropTypes,
+  navigationServices,
+  objectMap,
+  validation,
+  hexToRgb,
+} from "_utils"
 import { IconName, Icon } from "_c_a_icons"
 import MapView, { PROVIDER_GOOGLE, Marker } from "react-native-maps"
-import { Spaces, Colors } from "_styles"
+import { Spaces, Colors, FontSizes } from "_styles"
+
+const DEFAULT_TEXT = {
+  heading: "Alamat",
+  addressLabel: "Alamat",
+  addressPlaceholder: "Alamat lengkap resto ...",
+  kelurahanLabel: "Kelurahan",
+  kelurahanPlaceholder: "Masukkan kelurahan resto ...",
+  kecamatanLabel: "Kecamatan",
+  kecamatanPlaceholder: "Masukkan kecamatan resto ...",
+  postCodeLabel: "Kode Pos",
+  postCodePlaceholder: "Masukkan kode pos resto ...",
+}
 
 const screen = Dimensions.get("window")
 
 // Change this to configure zoom level (sort of)
 const LATITUDE_DELTA = 0.005
-
 const ASPECT_RATIO = screen.width / screen.height
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO
 
@@ -21,46 +38,72 @@ const FormAddressData = ({
   isFirstSetup,
   pinMapRouteName,
   iconMarker,
+  text = DEFAULT_TEXT,
 }) => {
-  const refAddress = useRef()
-  const refKelurahan = useRef()
-  const refKecamatan = useRef()
-  const refPostCode = useRef()
-
   const _coordinate = defaultVal.coordinate ? defaultVal.coordinate : undefined
-  const [coordinate, setCoordinate] = useState(_coordinate)
-
   const [isLoading, setLoading] = useState(false)
+  const [state, setState] = useState({
+    address: defaultVal.address,
+    kelurahan: defaultVal.kelurahan,
+    kecamatan: defaultVal.kecamatan,
+    postCode: defaultVal.postCode,
+    coordinate: _coordinate,
+  })
+  const [errorState, setErrorState] = useState(objectMap(state, () => null))
+
+  const checkExistField = str => {
+    return validation.validate("general", str)
+  }
+
+  const checkCoordinate = obj => {
+    const isValid = obj?.longitude && obj?.latitude
+    if (!isValid) return "Anda harus menambahkan Pin Map"
+    return null
+  }
 
   const onSubmit = () => {
-    const address = refAddress.current.state.text
-    const kelurahan = refKelurahan.current.state.text
-    const kecamatan = refKecamatan.current.state.text
-    const postCode = refPostCode.current.state.text
+    const data = state
+    const errorAddress = checkExistField(state.address)
+    const errorKelurahan = checkExistField(state.kelurahan)
+    const errorKecamatan = checkExistField(state.kecamatan)
+    const errorPostCode = checkExistField(state.postCode)
+    const errorCoordinate = checkCoordinate(state.coordinate)
+    // prettier-ignore
+    const isNotValid = errorAddress || errorKelurahan || errorKecamatan || errorPostCode || errorCoordinate
 
-    const data = {
-      address,
-      kelurahan,
-      kecamatan,
-      postCode,
-      coordinate,
+    console.log("StepAddress-default", defaultVal)
+    console.log("StepAddress-data", data)
+
+    if (isNotValid) {
+      setErrorState({
+        ...errorState,
+        address: errorAddress,
+        kelurahan: errorKelurahan,
+        kecamatan: errorKecamatan,
+        postCode: errorPostCode,
+        coordinate: errorCoordinate,
+      })
+      return false
     }
 
     setLoading(true)
-
-    // TODO: data validation
-
     onValidSubmit(data)
   }
 
   const handleMapClick = () => {
     navigationServices.Navigate(pinMapRouteName, {
       markerIcon: iconMarker,
-      markerCoor: coordinate,
+      markerCoor: state.coordinate,
       onSubmit: coor => {
         console.log("FormAddressData - PinMap.onSubmit: ", coor)
-
-        setCoordinate(coor)
+        setState({
+          ...state,
+          coordinate: coor,
+        })
+        setErrorState({
+          ...errorState,
+          coordinate: checkCoordinate(coor),
+        })
         navigationServices.GoBack()
       },
     })
@@ -68,40 +111,99 @@ const FormAddressData = ({
 
   return (
     <View style={styles.wrapper}>
-      {isFirstSetup && <Heading style={styles.heading} text="Alamat" />}
+      {isFirstSetup && (
+        <Heading
+          style={styles.heading}
+          text={text.heading || DEFAULT_TEXT.heading}
+        />
+      )}
 
       <Input
-        ref={refAddress}
-        defaultValue={defaultVal.address}
-        label="Alamat"
-        placeholder="Alamat lengkap resto ..."
+        label={text.addressLabel || DEFAULT_TEXT.addressLabel}
+        placeholder={text.addressPlaceholder || DEFAULT_TEXT.addressPlaceholder}
+        status={errorState.address ? "normal" : "warning"}
+        warning={errorState.address}
+        value={state.address}
+        onChangeText={text => {
+          const warning = checkExistField(text)
+          setErrorState({
+            ...errorState,
+            address: warning,
+          })
+          setState({
+            ...state,
+            address: text,
+          })
+        }}
       />
 
       <Input
-        ref={refKelurahan}
-        defaultValue={defaultVal.kelurahan}
         style={styles.input}
-        label="Kelurahan"
-        placeholder="Masukkan kelurahan resto ..."
+        label={text.kelurahanLabel || DEFAULT_TEXT.kelurahanLabel}
+        placeholder={
+          text.kelurahanPlaceholder || DEFAULT_TEXT.kelurahanPlaceholder
+        }
+        status={errorState.kelurahan ? "normal" : "warning"}
+        warning={errorState.kelurahan}
+        value={state.kelurahan}
+        onChangeText={text => {
+          const warning = checkExistField(text)
+          setErrorState({
+            ...errorState,
+            kelurahan: warning,
+          })
+          setState({
+            ...state,
+            kelurahan: text,
+          })
+        }}
       />
 
       <Input
-        ref={refKecamatan}
-        defaultValue={defaultVal.kecamatan}
         style={styles.input}
-        label="Kecamatan"
-        placeholder="Masukkan kecamatan resto ..."
+        label={text.kecamatanLabel || DEFAULT_TEXT.kecamatanLabel}
+        placeholder={
+          text.kecamatanPlaceholder || DEFAULT_TEXT.kecamatanPlaceholder
+        }
+        status={errorState.kecamatan ? "normal" : "warning"}
+        warning={errorState.kecamatan}
+        value={state.kecamatan}
+        onChangeText={text => {
+          const warning = checkExistField(text)
+          setErrorState({
+            ...errorState,
+            kecamatan: warning,
+          })
+          setState({
+            ...state,
+            kecamatan: text,
+          })
+        }}
       />
 
       <Input
-        ref={refPostCode}
-        defaultValue={defaultVal.postCode}
         style={styles.input}
-        label="Kode Pos"
-        placeholder="Masukkan kode pos resto ..."
+        label={text.postCodeLabel || DEFAULT_TEXT.postCodeLabel}
+        placeholder={
+          text.postCodePlaceholder || DEFAULT_TEXT.postCodePlaceholder
+        }
+        status={errorState.postCode ? "normal" : "warning"}
+        warning={errorState.postCode}
+        value={state.postCode}
+        onChangeText={text => {
+          const warning = checkExistField(text)
+          setErrorState({
+            ...errorState,
+            postCode: warning,
+          })
+          setState({
+            ...state,
+            postCode: text,
+          })
+        }}
       />
 
-      {coordinate ? (
+      {state.coordinate ? (
         <View style={styles.mapWrapperActive}>
           <InputLabel text="Pin Maps :" />
           <MapView
@@ -109,14 +211,14 @@ const FormAddressData = ({
             provider={PROVIDER_GOOGLE}
             onRegionChange={() => {}}
             region={{
-              longitude: coordinate.longitude,
-              latitude: coordinate.latitude,
+              longitude: state.coordinate.longitude,
+              latitude: state.coordinate.latitude,
               longitudeDelta: LONGITUDE_DELTA,
               latitudeDelta: LATITUDE_DELTA,
             }}
             scrollEnabled={false}
             zoomEnabled={false}>
-            <Marker coordinate={coordinate} style={styles.mapMarker}>
+            <Marker coordinate={state.coordinate} style={styles.mapMarker}>
               <View>
                 <Icon
                   name={iconMarker}
@@ -142,6 +244,12 @@ const FormAddressData = ({
             onPress={handleMapClick}
           />
         </View>
+      )}
+
+      {errorState.coordinate && (
+        <Infobox style={styles.infobox} textStyle={styles.infoboxText}>
+          {errorState.coordinate}
+        </Infobox>
       )}
 
       <Button
@@ -221,6 +329,14 @@ const styles = StyleSheet.create({
   mapMarkerIcon: {
     height: markerSize,
     width: markerSize,
+  },
+  infobox: {
+    marginTop: 10,
+    backgroundColor: hexToRgb(Colors.themeDanger, 0.1),
+  },
+  infoboxText: {
+    fontSize: FontSizes.small,
+    color: Colors.themeDanger,
   },
 })
 

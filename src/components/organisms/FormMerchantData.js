@@ -6,8 +6,30 @@ import { customPropTypes, validation, objectMap, hexToRgb } from "_utils"
 import { Colors, FontSizes } from "_styles"
 import { useEffect } from "react"
 
-const StepProfile = ({ onValidSubmit, data: defaultVal, isFirstSetup }) => {
-  const [isLoading, setLoading] = useState(false)
+const DEFAULT_TEXT = {
+  heading: "Profil Resto",
+  nameLabel: "Nama resto",
+  namePlaceholder: "Masukkan nama resto anda",
+  descriptionLabel: "Deskripsi",
+  descriptionPlaceholder: "Tentang resto ...",
+  emailLabel: "Email",
+  emailPlaceholder: "Email resto ...",
+  categoryLabel: "Kategori Resto",
+  categoryPlaceholder: "Kategori resto anda ...",
+  phoneNumberLabel: "Nomor HP",
+  phoneNumberPlaceholder: "Nomor hp resto ...",
+  coverPhotoLabel: "Upload foto sampul",
+  //   coverPhotoPlaceholder: null,
+}
+
+const FormMerchantData = ({
+  onValidSubmit,
+  data: defaultVal,
+  isFirstSetup,
+  isLoading: propIsLoading,
+  text = DEFAULT_TEXT,
+}) => {
+  const [isLoading, setLoading] = useState(propIsLoading || false)
   const [state, setState] = useState({
     name: defaultVal.name,
     description: defaultVal.description,
@@ -17,6 +39,11 @@ const StepProfile = ({ onValidSubmit, data: defaultVal, isFirstSetup }) => {
     coverPhoto: defaultVal.coverPhoto,
   })
   const [errorState, setErrorState] = useState(objectMap(state, () => null))
+
+  const checkFilled = value => {
+    if (!value) return "Kolom ini tidak boleh kosong"
+    return null
+  }
 
   const checkExistField = str => {
     return validation.validate("general", str)
@@ -33,8 +60,9 @@ const StepProfile = ({ onValidSubmit, data: defaultVal, isFirstSetup }) => {
     const errorEmail = checkEmail(state.email)
     const errorCategory = checkExistField(state.category)
     const errorPhoneNumber = checkExistField(state.phoneNumber)
+    const errorCoverPhoto = checkFilled(state.coverPhoto)
     // prettier-ignore
-    const isNotValid = errorName || errorDescription || errorEmail || errorCategory
+    const isNotValid = errorName || errorDescription || errorEmail || errorCategory || errorCoverPhoto
 
     console.log("StepProfile-default", defaultVal)
     console.log("StepProfile-data", data)
@@ -47,6 +75,7 @@ const StepProfile = ({ onValidSubmit, data: defaultVal, isFirstSetup }) => {
         email: errorEmail,
         category: errorCategory,
         phoneNumber: errorPhoneNumber,
+        coverPhoto: errorCoverPhoto,
       })
       return false
     }
@@ -60,15 +89,17 @@ const StepProfile = ({ onValidSubmit, data: defaultVal, isFirstSetup }) => {
     setState(defaultVal)
   }, [defaultVal])
 
+  useEffect(() => {
+    setLoading(propIsLoading)
+  }, [propIsLoading])
+
   return (
     <View style={styles.wrapper}>
-      {isFirstSetup && (
-        <Heading style={styles.heading} text="Profil Restoran" />
-      )}
+      {isFirstSetup && <Heading style={styles.heading} text={text.heading} />}
 
       <Input
-        label="Nama Resto"
-        placeholder="Masukkan nama resto anda ..."
+        label={text.nameLabel || DEFAULT_TEXT.nameLabel}
+        placeholder={text.namePlaceholder || DEFAULT_TEXT.namePlaceholder}
         status={errorState.name ? "normal" : "warning"}
         warning={errorState.name}
         value={state.name}
@@ -87,8 +118,10 @@ const StepProfile = ({ onValidSubmit, data: defaultVal, isFirstSetup }) => {
 
       <Input
         style={styles.input}
-        label="Deskripsi"
-        placeholder="Tentang resto ..."
+        label={text.descriptionLabel || DEFAULT_TEXT.descriptionLabel}
+        placeholder={
+          text.descriptionPlaceholder || DEFAULT_TEXT.descriptionPlaceholder
+        }
         status={errorState.description ? "normal" : "warning"}
         warning={errorState.description}
         value={state.description}
@@ -107,8 +140,8 @@ const StepProfile = ({ onValidSubmit, data: defaultVal, isFirstSetup }) => {
 
       <Input
         style={styles.input}
-        label="Email"
-        placeholder="Email resto ..."
+        label={text.emailLabel || DEFAULT_TEXT.emailLabel}
+        placeholder={text.emailPlaceholder || DEFAULT_TEXT.emailPlaceholder}
         keyboardType="email-address"
         status={errorState.email ? "normal" : "warning"}
         warning={errorState.email}
@@ -128,8 +161,10 @@ const StepProfile = ({ onValidSubmit, data: defaultVal, isFirstSetup }) => {
 
       <Input
         style={styles.input}
-        label="Kategori Resto"
-        placeholder="Kategori resto anda ..."
+        label={text.categoryLabel || DEFAULT_TEXT.categoryLabel}
+        placeholder={
+          text.categoryPlaceholder || DEFAULT_TEXT.categoryPlaceholder
+        }
         status={errorState.category ? "normal" : "warning"}
         warning={errorState.category}
         value={state.category}
@@ -148,8 +183,10 @@ const StepProfile = ({ onValidSubmit, data: defaultVal, isFirstSetup }) => {
 
       <Input
         style={styles.input}
-        label="Nomor HP"
-        placeholder="Nomor hp resto ..."
+        label={text.phoneNumberLabel || DEFAULT_TEXT.phoneNumberLabel}
+        placeholder={
+          text.phoneNumberPlaceholder || DEFAULT_TEXT.phoneNumberPlaceholder
+        }
         keyboardType="phone-pad"
         status={errorState.phoneNumber ? "normal" : "warning"}
         warning={errorState.phoneNumber}
@@ -169,7 +206,7 @@ const StepProfile = ({ onValidSubmit, data: defaultVal, isFirstSetup }) => {
 
       <InputPhoto
         style={{ ...styles.input, ...styles.coverPhoto }}
-        labelText="Upload foto sampul"
+        labelText={text.coverPhotoLabel || DEFAULT_TEXT.coverPhotoLabel}
         buttonText="Pilih Foto"
         buttonTextActive="Ganti Foto"
         source={state.coverPhoto}
@@ -178,15 +215,19 @@ const StepProfile = ({ onValidSubmit, data: defaultVal, isFirstSetup }) => {
             ...state,
             coverPhoto: image,
           })
+          setErrorState({
+            ...errorState,
+            coverPhoto: null,
+          })
         }}
       />
 
       {/* Optional: enable this if coverPhoto is required */}
-      {/* {errorState.coverPhoto && (
+      {errorState.coverPhoto && (
         <Infobox style={styles.infobox} textStyle={styles.infoboxText}>
-          Anda harus menyetujui kolom ini terlebih dahulu
+          {errorState.coverPhoto}
         </Infobox>
-      )} */}
+      )}
 
       <Button
         style={styles.submit}
@@ -199,7 +240,7 @@ const StepProfile = ({ onValidSubmit, data: defaultVal, isFirstSetup }) => {
   )
 }
 
-StepProfile.propTypes = {
+FormMerchantData.propTypes = {
   onValidSubmit: customPropTypes.functionWithParams(1),
   data: PropTypes.shape({
     name: PropTypes.string,
@@ -207,12 +248,27 @@ StepProfile.propTypes = {
     email: PropTypes.string,
     category: PropTypes.string,
     phoneNumber: PropTypes.string,
-    coverPhoto: customPropTypes.imageSource,
+    coverPhoto: InputPhoto.propTypes.source,
   }),
   isFirstSetup: PropTypes.bool,
+  text: PropTypes.shape({
+    heading: PropTypes.string,
+    nameLabel: PropTypes.string,
+    namePlaceholder: PropTypes.string,
+    descriptionLabel: PropTypes.string,
+    descriptionPlaceholder: PropTypes.string,
+    emailLabel: PropTypes.string,
+    emailDescription: PropTypes.string,
+    categoryLabel: PropTypes.string,
+    categoryPlaceholder: PropTypes.string,
+    phoneNumberLabel: PropTypes.string,
+    phoneNumberPlaceholder: PropTypes.string,
+    coverPhotoLabel: PropTypes.string,
+    coverPhotoPlaceholder: PropTypes.string,
+  }),
 }
 
-StepProfile.defaultProps = {
+FormMerchantData.defaultProps = {
   onValidSubmit: data => {},
   data: {
     name: null,
@@ -223,6 +279,7 @@ StepProfile.defaultProps = {
     coverPhoto: null,
   },
   isFirstSetup: true,
+  text: { ...DEFAULT_TEXT },
 }
 
 const styles = StyleSheet.create({
@@ -247,4 +304,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default StepProfile
+export default FormMerchantData

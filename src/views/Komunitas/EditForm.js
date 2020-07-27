@@ -158,7 +158,7 @@ class EditForm extends Component {
 
           <Button
             style={styles.submit}
-            text={isEditing ? "Simpan" : "Submit"}
+            text={isEditing ? "Simpan" : "Buat Komunitas"}
             size="large"
           />
         </View>

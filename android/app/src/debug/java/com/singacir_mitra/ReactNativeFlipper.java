@@ -40,7 +40,8 @@ public class ReactNativeFlipper {
           new NetworkingModule.CustomClientBuilder() {
             @Override
             public void apply(OkHttpClient.Builder builder) {
-              builder.addNetworkInterceptor(new FlipperOkhttpInterceptor(networkFlipperPlugin));
+              // Ini di disable buat fix axios form-data yg ke blokir karena Flipper
+              // builder.addNetworkInterceptor(new FlipperOkhttpInterceptor(networkFlipperPlugin));
             }
           });
       client.addPlugin(networkFlipperPlugin);

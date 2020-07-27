@@ -9,7 +9,7 @@ import { Warung } from "_views"
 
 const Tab = createMaterialTopTabNavigator()
 
-const DashboardMenuStack = () => (
+const DashboardMenuStack = ({ route, navigation }) => (
   <Tab.Navigator {...MaterialTopTabOptions} backBehavior="initialRoute">
     <Tab.Screen
       name="warung/dashboard/menu/tersedia"
@@ -17,6 +17,9 @@ const DashboardMenuStack = () => (
       options={{ title: "Tersedia" }}
       initialParams={{
         apiEndpoint: "/tersedia",
+        menus: route.params?.menus,
+        warungId: route.params?.warungId,
+        warungCategoryId: route.params?.warungCategoryId,
       }}
     />
     <Tab.Screen
@@ -26,6 +29,9 @@ const DashboardMenuStack = () => (
       initialParams={{
         apiEndpoint: "/habis",
         disabledAddMenu: true,
+        menus: route.params?.menus,
+        warungId: route.params?.warungId,
+        warungCategoryId: route.params?.warungCategoryId,
       }}
     />
   </Tab.Navigator>

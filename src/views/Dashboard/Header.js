@@ -12,7 +12,7 @@ import { useSelector } from "react-redux"
 import { navigationServices } from "_utils"
 
 const Header = ({ style }) => {
-  const username = useSelector(state => state.authReducer.username)
+  const username = useSelector(state => state.authReducer.fullname)
 
   return (
     <View style={{ ...styles.box, ...style }}>

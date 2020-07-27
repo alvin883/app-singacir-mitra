@@ -22,11 +22,16 @@ import { LoadingView } from "_organisms"
 import { useFocusEffect } from "@react-navigation/native"
 import { Colors, FontSizes } from "_styles"
 
-const StepPayment = ({
+const DEFAULT_TEXT = {
+  pencairanPlaceholder: "Nomor HP untuk pencairan saldo resto ...",
+}
+
+const FormPaymentData = ({
   onValidSubmit,
   onBackData,
   data: defaultVal,
   isLoading: propIsLoading,
+  text = DEFAULT_TEXT,
 }) => {
   const initBank = defaultVal.bank ? defaultVal.bank : null
   const initSavingBook = defaultVal.savingBook ? defaultVal.savingBook : null
@@ -175,7 +180,9 @@ const StepPayment = ({
       <Input
         style={styles.input}
         label="Nomor HP Pencairan Saldo"
-        placeholder="Nomor HP untuk pencairan saldo resto ..."
+        placeholder={
+          text.pencairanPlaceholder || DEFAULT_TEXT.pencairanPlaceholder
+        }
         keyboardType="phone-pad"
         status={errorState.phoneNumber ? "normal" : "warning"}
         warning={errorState.phoneNumber}
@@ -226,7 +233,7 @@ const StepPayment = ({
   )
 }
 
-StepPayment.propTypes = {
+FormPaymentData.propTypes = {
   onValidSubmit: PropTypes.func.isRequired,
   onBackData: PropTypes.func.isRequired,
   data: PropTypes.shape({
@@ -240,7 +247,7 @@ StepPayment.propTypes = {
   }),
 }
 
-StepPayment.defaultProps = {
+FormPaymentData.defaultProps = {
   onValidSubmit: data => {},
   onBackData: data => {},
   data: {
@@ -273,4 +280,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default StepPayment
+export default FormPaymentData

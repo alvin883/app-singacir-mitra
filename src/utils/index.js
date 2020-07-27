@@ -6,6 +6,7 @@ import * as customPropTypes from "./customPropTypes"
 // TODO: Delete sample
 export { default as sample } from "./sample"
 
+export { default as apiHelpers } from "./apiHelpers"
 export { default as getValues } from "./getValues"
 export { default as getKeys } from "./getKeys"
 export { default as shadeColor } from "./shadeColor"
@@ -21,4 +22,6 @@ export { default as formatDate } from "./formatDate"
 export { default as unixToDate } from "./unixToDate"
 export { default as dateToUnix } from "./dateToUnix"
 export { default as timeSince } from "./timeSince"
+export { default as asyncHandle } from "./asyncHandle"
+export { default as objectMap } from "./objectMap"
 export { permission, navigationServices, validation, customPropTypes }

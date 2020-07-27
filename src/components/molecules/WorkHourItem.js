@@ -5,22 +5,32 @@ import { InputLabel, Text, Button } from "_atoms"
 import { hexToRgb } from "_utils"
 import { Colors } from "_styles"
 
-const WorkHourItem = ({ label, openHour, closeHour, onPress }) => {
+const WorkHourItem = ({ label, openHour, closeHour, isOpen, onPress }) => {
   return (
     <View style={styles.wrapper}>
       <InputLabel text={label} />
       <View style={styles.bottom}>
-        <View style={styles.hourWrapper}>
-          <Text size="medium" style={{ ...styles.text }}>
-            {openHour}
-          </Text>
-          <Text size="medium" style={{ ...styles.text, ...styles.textDivider }}>
-            -
-          </Text>
-          <Text size="medium" style={{ ...styles.text }}>
-            {closeHour}
-          </Text>
-        </View>
+        {isOpen ? (
+          <View style={styles.hourWrapper}>
+            <Text size="medium" style={{ ...styles.text }}>
+              {openHour}
+            </Text>
+            <Text
+              size="medium"
+              style={{ ...styles.text, ...styles.textDivider }}>
+              -
+            </Text>
+            <Text size="medium" style={{ ...styles.text }}>
+              {closeHour}
+            </Text>
+          </View>
+        ) : (
+          <View style={styles.hourWrapper}>
+            <Text size="medium" style={{ ...styles.text }}>
+              Tutup
+            </Text>
+          </View>
+        )}
         <Button text="Ubah" type="secondary" onPress={onPress} />
       </View>
     </View>

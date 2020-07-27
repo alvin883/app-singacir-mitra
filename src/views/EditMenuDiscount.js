@@ -29,7 +29,11 @@ const FormMenuDiscountData = ({ onValidSubmit, data: defaultVal }) => {
 
     // TODO: validation
 
-    onValidSubmit(data)
+    console.log({
+      promoStart,
+      promoEnd,
+    })
+    // onValidSubmit(data)
   }
 
   return (
@@ -40,7 +44,7 @@ const FormMenuDiscountData = ({ onValidSubmit, data: defaultVal }) => {
         label="Harga Promo"
         keyboardType="number-pad"
         placeholder="Harga promo untuk menu ..."
-        defaultValue={defaultVal.promo_price.toString()}
+        defaultValue={defaultVal.promo_price?.toString()}
       />
 
       <TouchableOpacity

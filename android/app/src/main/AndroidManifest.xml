@@ -53,7 +53,7 @@
             <category android:name="android.intent.category.BROWSABLE" />
 
             <!-- TODO: Deep linking for reset link to aplication -->
-            <data android:scheme="https" android:host="movuent.com" />
+            <data android:scheme="https" android:host="si-ngacir.com" />
             <data android:scheme="singacir" android:host="resetpass" />
             
         </intent-filter>

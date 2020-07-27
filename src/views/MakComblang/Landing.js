@@ -16,16 +16,21 @@ import { BlockList } from "_organisms"
 import IllustrationMakcomblang from "_assets/images/illustration-makcomblang.png"
 import { useFocusEffect } from "@react-navigation/native"
 
-const gotoDetail = ({ id, title }) => {
-  console.log("MakComblangLanding - gotoDetail: ", id, title)
-  navigationServices.Navigate("makcomblang/detail", {
-    title: title,
-    community_id: id,
-    community_name: title,
-  })
-}
-
 const Landing = () => {
+  const gotoDetail = ({ id, title }) => {
+    console.log("MakComblangLanding - gotoDetail: ", id, title)
+    navigationServices.Navigate("makcomblang/detail", {
+      title: title,
+      community_id: id,
+      community_name: title,
+    })
+  }
+
+  const gotoRegister = () => {
+    console.log("MakComblangLanding - gotoRegister")
+    navigationServices.Navigate("makcomblang/register")
+  }
+
   useFocusEffect(
     useCallback(() => {
       StatusBar.setBackgroundColor(Colors.brandMakcomblang)
@@ -39,6 +44,14 @@ const Landing = () => {
         <View style={styles.heroBg} />
 
         <Image source={IllustrationMakcomblang} style={styles.image} />
+
+        <Button
+          style={styles.create}
+          text="Daftar Mak Comblang"
+          iconName={IconName.chevronRight}
+          iconPosition="right"
+          onPress={gotoRegister}
+        />
       </View>
 
       <View style={styles.bottom}>
@@ -64,7 +77,6 @@ const Landing = () => {
 const styles = StyleSheet.create({
   hero: {
     paddingTop: 30,
-    paddingBottom: 30,
     paddingHorizontal: Spaces.container,
   },
   heroBg: {

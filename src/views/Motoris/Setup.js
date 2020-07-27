@@ -54,7 +54,7 @@ const Setup = () => {
 
         <Button
           style={styles.submit}
-          text="Submit"
+          text="Selanjutnya"
           size="large"
           state={isLoading ? "loading" : "default"}
           onPress={onSubmit}

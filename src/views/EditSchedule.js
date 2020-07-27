@@ -42,11 +42,14 @@ const EditSchedule = ({ navigation, route }) => {
 
   // Check passed value from route .params
   const isSchedule = route.params && route.params.defaultVal
-  const defaultOpen = isSchedule ? route.params.defaultVal.open : null
-  const defaultClose = isSchedule ? route.params.defaultVal.close : null
+  const defaultIsOpen = isSchedule ? route.params.defaultVal.isOpen : false
+  const defaultOpen = isSchedule ? route.params.defaultVal.openResto : null
+  const defaultClose = isSchedule ? route.params.defaultVal.closeResto : null
 
   // State
-  const [selectedRadio, setSelectedRadio] = useState(RADIO_VALUES.custom)
+  const [selectedRadio, setSelectedRadio] = useState(
+    defaultIsOpen ? RADIO_VALUES.custom : RADIO_VALUES.closed,
+  )
   const [openTime, setOpenTime] = useState(defaultOpen)
   const [closeTime, setCloseTime] = useState(defaultClose)
   const [timePickerValue, setTimePickerValue] = useState(defaultPickerValue)
@@ -112,19 +115,23 @@ const EditSchedule = ({ navigation, route }) => {
   const onSubmit = () => {
     const isOnSubmit = route.params && route.params.onSubmit
     let data = {
-      open: null,
-      close: null,
+      openResto: null,
+      closeResto: null,
+      isOpen: false,
     }
 
     if (selectedRadio === RADIO_VALUES.allTime) {
-      data.open = "allTime"
-      data.close = "allTime"
+      data.openResto = "00:00"
+      data.closeResto = "23:59"
+      data.isOpen = true
     } else if (selectedRadio === RADIO_VALUES.closed) {
-      data.open = "closed"
-      data.close = "closed"
+      data.openResto = "00:00"
+      data.closeResto = "00:00"
+      data.isOpen = false
     } else {
-      data.open = openTime
-      data.close = closeTime
+      data.openResto = openTime
+      data.closeResto = closeTime
+      data.isOpen = true
     }
 
     console.log(data)
@@ -191,7 +198,7 @@ const EditSchedule = ({ navigation, route }) => {
       <Button
         style={styles.submit}
         size="large"
-        text="Submit"
+        text="Simpan"
         onPress={onSubmit}
       />
     </View>

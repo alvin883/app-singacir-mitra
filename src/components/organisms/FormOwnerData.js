@@ -1,4 +1,10 @@
-import React, { Component, useState, useRef } from "react"
+import React, {
+  Component,
+  useState,
+  useRef,
+  useCallback,
+  useEffect,
+} from "react"
 import PropTypes from "prop-types"
 import { Dimensions, StyleSheet } from "react-native"
 import ImagePicker from "react-native-image-picker"
@@ -10,60 +16,136 @@ import {
   InputSelect,
   Infobox,
 } from "_atoms"
-import { FontSizes, Spaces } from "_styles"
-import { permission, customPropTypes } from "_utils"
+import { FontSizes, Spaces, Colors } from "_styles"
+import {
+  permission,
+  customPropTypes,
+  objectMap,
+  validation,
+  hexToRgb,
+  asyncHandle,
+} from "_utils"
 import { IconName } from "_c_a_icons"
 import { cardIdentity } from "_types"
+import { useFocusEffect } from "@react-navigation/native"
+import Axios from "axios"
+import { LoadingView } from "_organisms"
 
-const FormOwnerData = ({ isFirstSetup, onValidSubmit, data: defaultVal }) => {
-  const refName = useRef()
-  const refPhoneNumber = useRef()
-  const refEmail = useRef()
-  const refIdentityNumber = useRef()
-
-  const [identityType, setIdentityType] = useState(defaultVal.identityType)
-  const [identityPhoto, setIdentityPhoto] = useState(defaultVal.identityPhoto)
-  const [isLoading, setLoading] = useState(false)
-
-  const cardIdentityOptions = Object.values(cardIdentity)
+const FormOwnerData = ({
+  isFirstSetup,
+  onValidSubmit,
+  data: defaultVal,
+  isLoading: propIsLoading,
+}) => {
+  const [isLoading, setLoading] = useState(propIsLoading || false)
+  const [isFetching, setFetching] = useState(isFirstSetup)
+  const [cardOptions, setCardOptions] = useState(cardIdentity)
+  const [identityLabel, setIdentityLabel] = useState(null)
+  const [state, setState] = useState({
+    name: defaultVal.name,
+    phoneNumber: defaultVal.phoneNumber,
+    email: defaultVal.email,
+    identityType: defaultVal.identityType,
+    identityNumber: defaultVal.identityNumber,
+    identityPhoto: defaultVal.identityPhoto,
+  })
+  const [errorState, setErrorState] = useState(objectMap(state, val => null))
 
   const onSelectIdentityType = (val, index) => {
-    setIdentityType(cardIdentityOptions[index - 1])
+    setState({
+      ...state,
+      identityType: val,
+    })
+    setErrorState({
+      ...errorState,
+      identityType: null,
+    })
+    setIdentityLabel(cardOptions[index - 1]?.label || "")
   }
 
   const onSelectPhoto = image => {
-    setIdentityPhoto(image)
+    setState({
+      ...state,
+      identityPhoto: image,
+    })
+    setErrorState({
+      ...errorState,
+      identityPhoto: null,
+    })
+  }
+
+  const checkExistField = str => {
+    return validation.validate("general", str)
+  }
+
+  const checkEmail = str => {
+    return validation.validate("email", str)
+  }
+
+  const checkFilled = value => {
+    if (!value) return "Kolom ini tidak boleh kosong"
+    return null
   }
 
   const onSubmit = () => {
-    const name = refName.current.state.text
-    const phoneNumber = refPhoneNumber.current.state.text
-    const email = refEmail.current.state.text
-    const identityNumber = isFirstSetup
-      ? refIdentityNumber.current.state.text
-      : null
+    const _dataUpdate = {
+      name: state.name,
+      phoneNumber: state.phoneNumber,
+      email: state.email,
+    }
+    const data = isFirstSetup ? state : _dataUpdate
+    const errorName = checkExistField(state.name)
+    const errorPhoneNumber = checkExistField(state.phoneNumber)
+    const errorEmail = checkEmail(state.email)
+    const errorIdentityType = checkFilled(state.identityType)
+    const errorIdentityNumber = checkExistField(state.identityNumber)
+    const errorIdentityPhoto = checkFilled(state.identityPhoto)
+    // prettier-ignore
+    const isNotValid = errorName || errorPhoneNumber || errorEmail || errorIdentityType || errorIdentityNumber || errorIdentityPhoto
 
-    const data = isFirstSetup
-      ? {
-          name: name,
-          phoneNumber: phoneNumber,
-          email: email,
-          identityType: identityType,
-          identityNumber: identityNumber,
-          identityPhoto: identityPhoto,
-        }
-      : {
-          name: name,
-          phoneNumber: phoneNumber,
-          email: email,
-        }
+    if (isNotValid) {
+      setErrorState({
+        ...errorState,
+        name: errorName,
+        phoneNumber: errorPhoneNumber,
+        email: errorEmail,
+        identityType: errorIdentityType,
+        identityNumber: errorIdentityNumber,
+        identityPhoto: errorIdentityPhoto,
+      })
+      return false
+    }
 
     setLoading(true)
-
-    // TODO: Validation
-
     onValidSubmit(data)
   }
+
+  const fetchCardOptions = async () => {
+    const request = Axios.get("cards/showAll")
+    const [response, err] = await asyncHandle(request)
+    if (err) return alert("Terjadi kesalahan")
+
+    const data = response.data.data
+    if (!data.length) return alert("Data cards tidak ditemukan")
+    const mapping = data.map(val => ({
+      label: val.name,
+      value: val.id.toString(),
+    }))
+    setCardOptions(mapping)
+    setFetching(false)
+  }
+
+  useFocusEffect(
+    useCallback(() => {
+      if (isFirstSetup) fetchCardOptions()
+    }, []),
+  )
+
+  useEffect(() => {
+    setLoading(propIsLoading)
+  }, [propIsLoading])
+
+  if (isFetching) return <LoadingView style={styles.loading} />
 
   return (
     <>
@@ -72,30 +154,68 @@ const FormOwnerData = ({ isFirstSetup, onValidSubmit, data: defaultVal }) => {
       )}
 
       <Input
-        ref={refName}
-        defaultValue={defaultVal.name}
         style={{ ...styles.input, marginTop: 20 }}
         label="Nama Lengkap"
         placeholder="Masukkan nama lengkap anda ..."
+        status={errorState.name ? "normal" : "warning"}
+        warning={errorState.name}
+        value={state.name}
+        onChangeText={text => {
+          const warning = checkExistField(text)
+          setErrorState({
+            ...errorState,
+            name: warning,
+          })
+          setState({
+            ...state,
+            name: text,
+          })
+        }}
       />
 
       <Input
-        ref={refPhoneNumber}
-        defaultValue={defaultVal.phoneNumber}
         style={styles.input}
         label="Nomer Telepon"
         placeholder="Nomer telepon pemilik ..."
         keyboardType="phone-pad"
+        status={errorState.phoneNumber ? "normal" : "warning"}
+        warning={errorState.phoneNumber}
+        value={state.phoneNumber}
+        onChangeText={text => {
+          const warning = checkExistField(text)
+          setErrorState({
+            ...errorState,
+            phoneNumber: warning,
+          })
+          setState({
+            ...state,
+            phoneNumber: text,
+          })
+        }}
       />
 
-      <Input
-        ref={refEmail}
-        defaultValue={defaultVal.email}
-        style={styles.input}
-        label="Email"
-        placeholder="Email pemilik ..."
-        keyboardType="email-address"
-      />
+      {isFirstSetup && (
+        <Input
+          style={styles.input}
+          label="Email"
+          placeholder="Email pemilik ..."
+          keyboardType="email-address"
+          status={errorState.email ? "normal" : "warning"}
+          warning={errorState.email}
+          value={state.email}
+          onChangeText={text => {
+            const warning = checkEmail(text)
+            setErrorState({
+              ...errorState,
+              email: warning,
+            })
+            setState({
+              ...state,
+              email: text,
+            })
+          }}
+        />
+      )}
 
       {isFirstSetup && (
         <>
@@ -103,31 +223,55 @@ const FormOwnerData = ({ isFirstSetup, onValidSubmit, data: defaultVal }) => {
             style={styles.selectWrapper}
             label="Jenis Identitas"
             placeholder="Jenis identitas yang akan di upload ..."
-            options={cardIdentityOptions}
+            options={cardOptions}
             onSelect={onSelectIdentityType}
-            value={identityType.value}
+            value={state.identityType?.value}
           />
 
+          {errorState.identityType && (
+            <Infobox style={styles.infobox} textStyle={styles.infoboxText}>
+              {errorState.identityType}
+            </Infobox>
+          )}
+
           <Input
-            ref={refIdentityNumber}
-            defaultValue={defaultVal.identityNumber}
             style={styles.input}
             label="Nomer Identitas Pemilik"
             placeholder="Nomor identitas pemilik ..."
+            status={errorState.identityNumber ? "normal" : "warning"}
+            warning={errorState.identityNumber}
+            value={state.identityNumber}
+            onChangeText={text => {
+              const warning = checkExistField(text)
+              setErrorState({
+                ...errorState,
+                identityNumber: warning,
+              })
+              setState({
+                ...state,
+                identityNumber: text,
+              })
+            }}
           />
 
           <InputPhoto
             style={styles.input}
-            labelText={`Upload ${identityType.label}`}
+            labelText={`Upload ${identityLabel}`}
             buttonText="Pilih Foto"
             buttonTextActive="Ganti Foto"
-            source={identityPhoto}
+            source={state.identityPhoto}
             onSelectPhoto={onSelectPhoto}
           />
 
-          <Infobox iconName={IconName.information} style={styles.infobox}>
-            - Pastikan KTP didalam frame{"\n"}- Pastikan KTP masih berlaku{"\n"}
-            - Maksimal 3MB
+          {errorState.identityPhoto && (
+            <Infobox style={styles.infobox} textStyle={styles.infoboxText}>
+              {errorState.identityPhoto}
+            </Infobox>
+          )}
+
+          <Infobox iconName={IconName.information} style={styles.infoboxInfo}>
+            - Pastikan didalam frame{"\n"}- Pastikan masih berlaku{"\n"}-
+            Maksimal 3MB
           </Infobox>
         </>
       )}
@@ -153,7 +297,7 @@ FormOwnerData.propTypes = {
     email: PropTypes.string,
     identityType: PropTypes.any,
     identityNumber: PropTypes.string,
-    identityPhoto: customPropTypes.imageSource,
+    identityPhoto: InputPhoto.propTypes.source,
   }),
 }
 
@@ -171,6 +315,9 @@ FormOwnerData.defaultProps = {
 }
 
 const styles = StyleSheet.create({
+  loading: {
+    marginTop: 50,
+  },
   heading: {
     textAlign: "center",
     fontSize: FontSizes.normal,
@@ -183,8 +330,16 @@ const styles = StyleSheet.create({
   input: {
     marginTop: 26,
   },
-  infobox: {
+  infoboxInfo: {
     marginTop: 20,
+  },
+  infobox: {
+    marginTop: 10,
+    backgroundColor: hexToRgb(Colors.themeDanger, 0.1),
+  },
+  infoboxText: {
+    fontSize: FontSizes.small,
+    color: Colors.themeDanger,
   },
   button: {
     marginTop: 40,

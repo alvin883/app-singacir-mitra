@@ -1,5 +1,9 @@
-const convertToCurrency = (price, decimal = 0) => {
-  if (!price) return ""
+const convertToCurrency = (price, decimal = 0, showEmpty = true) => {
+  if (!price && showEmpty) {
+    return ""
+  } else if (!price) {
+    return "0"
+  }
 
   let fixedNumber = price.toString()
 

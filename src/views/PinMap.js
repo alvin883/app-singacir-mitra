@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react"
+import React, { useState, useRef, useCallback } from "react"
 import MapView, {
   PROVIDER_GOOGLE,
   Marker,
@@ -7,8 +7,12 @@ import MapView, {
 } from "react-native-maps"
 import { Icon, IconName } from "_c_a_icons"
 import { Colors, Spaces } from "_styles"
-import { View, StyleSheet, Dimensions } from "react-native"
+import { View, StyleSheet, Dimensions, Alert } from "react-native"
 import { Button } from "_atoms"
+import { useFocusEffect } from "@react-navigation/native"
+import Geolocation from "@react-native-community/geolocation"
+import { navigationServices } from "_utils"
+import { LoadingView } from "_organisms"
 
 const screen = Dimensions.get("window")
 
@@ -32,6 +36,7 @@ const PinMap = ({ navigation, route }) => {
 
   const initCoor = customMarkerCoor ? customMarkerCoor : defaultMarkerCoor
   const [markerCoor, setMarkerCoor] = useState(initCoor)
+  const [isLoading, setLoading] = useState(true)
 
   /**
    * Function to handle onSubmit event, with coordinate parameter
@@ -50,6 +55,50 @@ const PinMap = ({ navigation, route }) => {
       300,
     )
   }
+
+  useFocusEffect(
+    useCallback(() => {
+      if (!customMarkerCoor) {
+        Geolocation.getCurrentPosition(
+          position => {
+            setMarkerCoor(position.coords)
+            setLoading(false)
+          },
+          error => {
+            console.log(error)
+            if (error.PERMISSION_DENIED) {
+              Alert.alert(
+                "Error",
+                "Fitur ini membutuhkan akses lokasi pada perangkat anda, harap izinkan akses lokasi untuk melanjutkan",
+                [
+                  {
+                    text: "Oke",
+                    onPress: navigationServices.GoBack(),
+                  },
+                ],
+              )
+            } else {
+              Alert.alert("Error", "Terjadi kesalahan, silahkan coba kembali", [
+                {
+                  text: "Oke",
+                  onPress: navigationServices.GoBack(),
+                },
+              ])
+            }
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 1000,
+          },
+        )
+      } else {
+        setLoading(false)
+      }
+    }, []),
+  )
+
+  if (isLoading) return <LoadingView />
 
   return (
     <View style={styles.wrapper}>
@@ -85,7 +134,7 @@ const PinMap = ({ navigation, route }) => {
         <View style={styles.submit}>
           <Button
             size="large"
-            text="Submit"
+            text="Oke"
             onPress={() => onSubmit(markerCoor)}
           />
         </View>

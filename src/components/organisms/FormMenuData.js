@@ -4,7 +4,12 @@ import { View, ScrollView, StyleSheet, Dimensions } from "react-native"
 import { Input, Button, InputPhoto, InputLabel, Text } from "_atoms"
 import { IconName } from "_c_a_icons"
 import { Spaces, Colors } from "_styles"
-import { customPropTypes, navigationServices, validation } from "_utils"
+import {
+  customPropTypes,
+  navigationServices,
+  validation,
+  objectMap,
+} from "_utils"
 
 const FormMenuData = ({
   onValidSubmit,
@@ -14,6 +19,21 @@ const FormMenuData = ({
   const refName = useRef()
   const refPrice = useRef()
   const refDescription = useRef()
+
+  const [isLoading, setLoading] = useState(false)
+  const [state, setState] = useState({
+    name: defaultVal?.menu_name || null,
+    price: defaultVal?.menu_price || null,
+    description: defaultVal?.menu_description || null,
+    promoPrice: defaultVal?.promo_price || null,
+    promoStart: defaultVal?.promo_start || null,
+    promoEnd: defaultVal?.promo_end || null,
+    promoDescription: defaultVal?.promo_description || null,
+    menuPict: defaultVal?.menu_pict || null,
+    // pedagangId: null,
+    // mitraId: null,
+  })
+  const [errorState, setErrorState] = useState(objectMap(state, val => null))
 
   const [error, setError] = useState({
     name: null,
@@ -31,6 +51,30 @@ const FormMenuData = ({
   const [menuPict, setMenuPict] = useState(initMenuPict)
   const [discount, setDiscount] = useState(initDiscount)
 
+  const checkExistField = str => {
+    return validation.validate("general", str)
+  }
+
+  const checkFilled = value => {
+    if (!value) return "Kolom ini tidak boleh kosong"
+    return null
+  }
+
+  const checkOptional = str => {
+    return null
+  }
+
+  const onInputChange = (value, field, validateFunc = checkExistField) => {
+    setState({
+      ...state,
+      [field]: value,
+    })
+    setErrorState({
+      ...errorState,
+      [field]: validateFunc(value),
+    })
+  }
+
   const onClickPromo = () => {
     navigationServices.Navigate(editPromoRouteName, {
       data: discount,
@@ -46,60 +90,82 @@ const FormMenuData = ({
   }
 
   const onSubmit = () => {
-    const name = refName.current.state.text
-    const price = refPrice.current.state.text
-    const description = refDescription.current.state.text
+    // const name = refName.current.state.text
+    // const price = refPrice.current.state.text
+    // const description = refDescription.current.state.text
 
-    const data = {
-      menu_name: name,
-      menu_price: parseInt(price),
-      menu_description: description,
-      menu_pict: menuPict,
-      promo_price: discount.promo_price,
-      promo_start: discount.promo_start,
-      promo_end: discount.promo_end,
-      promo_description: discount.promo_description,
+    // const data = {
+    //   menu_name: name,
+    //   menu_price: parseInt(price),
+    //   menu_description: description,
+    //   menu_pict: menuPict,
+    //   promo_price: discount.promo_price,
+    //   promo_start: discount.promo_start,
+    //   promo_end: discount.promo_end,
+    //   promo_description: discount.promo_description,
+    // }
+
+    const data = state
+    const errorName = checkExistField(state.name)
+    const errorPrice = checkExistField(state.price)
+    const isNotValid = errorName || errorPrice
+
+    if (isNotValid) {
+      setErrorState({
+        ...errorState,
+        name: errorName,
+        price: errorPrice,
+      })
+      return false
     }
+
+    setLoading(true)
+    onValidSubmit(data)
+    console.log("FormMenuData onSubmit: ", data)
 
     // TODO: validation
-    const vName = validation.validate("general", name)
-    const vPrice = validation.validate("general", price)
+    // const vName = validation.validate("general", name)
+    // const vPrice = validation.validate("general", price)
 
-    const isValid = !vName && !vPrice
+    // const isValid = !vName && !vPrice
 
-    if (!isValid) {
-      setError({
-        name: vName,
-        price: vPrice,
-      })
-    } else {
-      console.log("FormMenuData onSubmit: ", data)
-      onValidSubmit(data)
-    }
+    // if (!isValid) {
+    //   setError({
+    //     name: vName,
+    //     price: vPrice,
+    //   })
+    // } else {
+    // console.log("FormMenuData onSubmit: ", data)
+    // onValidSubmit(data)
+    // }
   }
 
   return (
     <ScrollView>
       <View style={styles.wrapper}>
         <Input
-          ref={refName}
+          // ref={refName}
+          // defaultValue={defaultVal.menu_name}
           style={styles.input}
           label="Nama"
           placeholder="Nama menu ..."
-          defaultValue={defaultVal.menu_name}
-          warning={error.name}
-          status={error.name ? "error" : "normal"}
+          warning={errorState.name}
+          status={errorState.name ? "error" : "normal"}
+          value={state.name}
+          onChangeText={text => onInputChange(text, "name")}
         />
 
         <Input
-          ref={refPrice}
+          // ref={refPrice}
+          // defaultValue={defaultVal?.menu_price?.toString()}
           style={styles.input}
           label="Harga"
           placeholder="Harga menu ..."
           keyboardType="number-pad"
-          defaultValue={defaultVal?.menu_price?.toString()}
-          warning={error.price}
-          status={error.price ? "error" : "normal"}
+          warning={errorState.price}
+          status={errorState.price ? "error" : "normal"}
+          value={state.price?.toString()}
+          onChangeText={text => onInputChange(text, "price")}
         />
 
         <View style={styles.promoWrapper}>
@@ -143,24 +209,33 @@ const FormMenuData = ({
         </View>
 
         <Input
-          ref={refDescription}
+          // ref={refDescription}
+          // defaultValue={defaultVal.menu_description}
           style={styles.input}
           label="Deskripsi (opsional)"
           placeholder="Deskripsi tentang menu ..."
-          defaultValue={defaultVal.menu_description}
+          warning={errorState.description}
+          status={errorState.description ? "error" : "normal"}
+          value={state.description}
+          onChangeText={text =>
+            onInputChange(text, "description", checkOptional)
+          }
         />
 
         <InputPhoto
           style={styles.input}
           labelText="Upload foto menu:"
-          source={menuPict}
-          onSelectPhoto={onSelectImage}
+          source={state.menuPict}
+          onSelectPhoto={image =>
+            onInputChange(image, "menuPict", checkOptional)
+          }
         />
 
         <Button
           style={styles.submit}
           text="Simpan"
           size="large"
+          isLoading={isLoading}
           onPress={onSubmit}
         />
       </View>

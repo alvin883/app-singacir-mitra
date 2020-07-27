@@ -14,7 +14,11 @@ const RenderButtons = ({ items }) => {
       key={i}
       activeOpacity={0.5}
       onPress={() => navigationServices.Navigate(val.link)}>
-      <View style={styles.buttonCircle}>
+      <View
+        style={{
+          ...styles.buttonCircle,
+          ...(val.color ? { backgroundColor: val.color } : {}),
+        }}>
         <Icon
           name={val.iconName}
           color={Colors.themeLight}
@@ -41,24 +45,28 @@ const Features = ({ authRole }) => {
       name: "Resto",
       iconName: IconName.fork,
       link: "dashboard/resto",
+      color: Colors.brandResto,
     })
   } else if (authRole === role.WARUNG) {
     items.push({
       name: "Warung Emak",
       iconName: IconName.store,
       link: "dashboard/warung",
+      color: Colors.brandWarung,
     })
   } else if (authRole === role.PEDAGANG) {
     items.push({
       name: "Pedagang Keliling",
       iconName: IconName.fork,
       link: "dashboard/pedagang",
+      color: Colors.brandPedagang,
     })
   } else if (authRole === role.MOTORIS) {
     items.push({
       name: "Motoris",
       iconName: IconName.motocycle,
       link: "dashboard/motoris",
+      color: Colors.brandMotoris,
     })
   }
 
@@ -66,12 +74,14 @@ const Features = ({ authRole }) => {
     name: "Komunitas",
     iconName: IconName.people,
     link: "komunitas",
+    color: Colors.brandKomunitas,
   })
 
   items.push({
     name: "Mak Comblang",
     iconName: IconName.hand,
     link: "makcomblang",
+    color: Colors.brandMakcomblang,
   })
 
   return (

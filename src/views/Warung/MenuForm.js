@@ -1,12 +1,105 @@
-import React, { useRef, useState } from "react"
+import React, { useRef, useState, useCallback } from "react"
 import PropTypes from "prop-types"
-import { FormMenuData } from "_organisms"
+import { FormMenuData, LoadingView } from "_organisms"
+import { useFocusEffect } from "@react-navigation/native"
+import axios from "axios"
+import { useSelector } from "react-redux"
+import { asyncHandle, navigationServices } from "_utils"
+import { Alert } from "react-native"
 
 const MenuForm = ({ navigation, route }) => {
+  const mitraId = useSelector(state => state.authReducer.mitraId)
+  // const [warungId, setWarungId] = useState()
+  const [isFetching, setFetching] = useState(false)
+  const warungId = route.params.warungId
+  const warungCategoryId = route.params.warungCategoryId
+
+  const errorHandler = (
+    err,
+    titleLog = "Steps Error",
+    errorCodeLog = "",
+    message = "Terjadi kesalahan, silahkan coba beberapa saat lagi",
+  ) => {
+    console.log(titleLog, err)
+    console.log(titleLog, err?.response?.data)
+    alert(`${message}${errorCodeLog ? `\n\ncodeError: ${errorCodeLog}` : ``}`)
+    setFetching(false)
+    navigationServices.GoBack()
+    return false
+  }
+
+  // const fetchWarungId = async () => {
+  //   let apiPromise, apiRes, apiErr
+
+  //   // Get warungId
+  //   apiPromise = axios.get("mitras/showMitra", { params: { mitraId: mitraId } })
+  //   ;[apiRes, apiErr] = await asyncHandle(apiPromise)
+  //   if (apiErr) return errorHandler(apiErr, "showMitraErr", "mitra-1")
+  //   const warungId = apiRes.data.data.Warung.id
+
+  //   setWarungId(warungId)
+  //   setFetching(false)
+  // }
+
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     fetchWarungId()
+  //   }, []),
+  // )
+
+  const onSubmit = async data => {
+    let apiData, apiParams, apiPromise, apiRes, apiErr
+    let uploadedImageURL
+
+    if (data.menuPict) {
+      apiData = new FormData()
+      apiData.append("image", {
+        uri: data.menuPict.uri,
+        name: "warungMenuPhoto.jpg",
+        type: "image/jpeg",
+      })
+      apiPromise = axios.post("uploadimage/warungmenu", apiData)
+      ;[apiRes, apiErr] = await asyncHandle(apiPromise)
+      if (apiErr) return errorHandler(apiErr, "uploadImageErr")
+      uploadedImageURL = apiRes.data.image_url
+    }
+
+    console.log({ uploadedImageURL, warungCategoryId })
+
+    // Get warungId
+    apiParams = { params: { mitraId: mitraId } }
+    apiData = {
+      name: data.name,
+      price: data.price,
+      description: data.description,
+      promoPrice: data.promoPrice,
+      promoStart: data.promoStart,
+      promoEnd: data.promoEnd,
+      promoDescription: data.promoDescription,
+      warungId: warungId,
+      menuPict: uploadedImageURL,
+      warungCategoryId: warungCategoryId,
+    }
+    apiPromise = axios.post("warungmenu/add", apiData, apiParams)
+    ;[apiRes, apiErr] = await asyncHandle(apiPromise)
+    if (apiErr) return errorHandler(apiErr, "addMenuErr", "add-1")
+
+    console.log("apiRes", apiRes.data)
+    Alert.alert("Sukses", "Menu berhasil ditambahkan", [
+      {
+        text: "Oke",
+        onPress: navigationServices.GoBack(),
+      },
+    ])
+  }
+
+  if (isFetching) return <LoadingView />
+
   return (
     <FormMenuData
       data={route.params?.data}
-      onValidSubmit={route.params?.onValidSubmit}
+      // onValidSubmit={route.params?.onValidSubmit}
+      onValidSubmit={onSubmit}
       editPromoRouteName="warung/dashboard/edit-promo"
     />
   )

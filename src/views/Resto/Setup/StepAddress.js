@@ -45,6 +45,9 @@ const StepAddress = ({ data: defaultVal, onValidSubmit }) => {
       pinMap,
     }
 
+    console.log("StepAddress-default", defaultVal)
+    console.log("StepAddress-data", data)
+
     setLoading(true)
 
     // TODO: data validation

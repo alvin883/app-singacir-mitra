@@ -6,57 +6,103 @@ import { Spaces, Colors } from "_styles"
 import { hexToRgb, navigationServices } from "_utils"
 import { WorkHourItem } from "_molecules"
 
-const DAY_NAME = [
-  "Senin",
-  "Selasa",
-  "Rabu",
-  "Kamis",
-  "Jum'at",
-  "Sabtu",
-  "Minggu",
+// DAYS id follow JavaScript day array [0 = sunday; 6 = saturday]
+const DAYS = [
+  {
+    id: 1,
+    name: "Senin",
+  },
+  {
+    id: 2,
+    name: "Selasa",
+  },
+  {
+    id: 3,
+    name: "Rabu",
+  },
+  {
+    id: 4,
+    name: "Kamis",
+  },
+  {
+    id: 5,
+    name: "Jum'at",
+  },
+  {
+    id: 6,
+    name: "Sabtu",
+  },
+  {
+    id: 0,
+    name: "Minggu",
+  },
 ]
 
 const SCHEDULE_SAMPLE = [
   {
-    open: "10:45",
-    close: "21:00",
+    day: DAYS[0].id,
+    openResto: "00:00",
+    closeResto: "00:00",
+    isOpen: false,
   },
   {
-    open: "11:45",
-    close: "22:00",
+    day: DAYS[1].id,
+    openResto: "00:00",
+    closeResto: "00:00",
+    isOpen: false,
   },
   {
-    open: "12:45",
-    close: "23:00",
+    day: DAYS[2].id,
+    openResto: "00:00",
+    closeResto: "00:00",
+    isOpen: false,
   },
   {
-    open: "09:45",
-    close: "20:00",
+    day: DAYS[3].id,
+    openResto: "00:00",
+    closeResto: "00:00",
+    isOpen: false,
   },
   {
-    open: "10:45",
-    close: "21:00",
+    day: DAYS[4].id,
+    openResto: "00:00",
+    closeResto: "00:00",
+    isOpen: false,
   },
   {
-    open: "08:45",
-    close: "19:00",
+    day: DAYS[5].id,
+    openResto: "00:00",
+    closeResto: "00:00",
+    isOpen: false,
   },
   {
-    open: "07:45",
-    close: "18:00",
+    day: DAYS[6].id,
+    openResto: "00:00",
+    closeResto: "00:00",
+    isOpen: false,
   },
 ]
 
-const FormWorkHour = ({ onValidSubmit, isFirstSetup, editRouteName }) => {
-  const [schedule, setSchedule] = useState(SCHEDULE_SAMPLE)
+const FormWorkHour = ({
+  onValidSubmit,
+  isFirstSetup,
+  editRouteName,
+  data,
+  isLoading: propIsLoading,
+}) => {
+  const [schedule, setSchedule] = useState(data || SCHEDULE_SAMPLE)
 
-  const onSubmitScheduleItem = (index, data) => {
-    navigationServices.GoBack()
-
+  const onSubmitScheduleItem = (index, data, dayId) => {
     let _schedule = [...schedule]
-    _schedule[index] = data
-
+    _schedule[index] = { ...data, day: dayId }
+    navigationServices.GoBack()
     setSchedule(_schedule)
+    console.log("onSubmitScheduleItem", _schedule)
+  }
+
+  const onSubmit = () => {
+    console.log("onSubmit", schedule)
+    onValidSubmit(schedule)
   }
 
   return (
@@ -65,19 +111,24 @@ const FormWorkHour = ({ onValidSubmit, isFirstSetup, editRouteName }) => {
         <Heading style={styles.heading} text="Jam Operasional" size="3" />
       )}
 
-      {DAY_NAME.map((name, i) => {
+      {DAYS.map(({ name, id }, i) => {
         return (
           <React.Fragment key={i}>
             {/* {i !== 0 && <Divider style={styles.divider} />} */}
             <WorkHourItem
               label={name}
-              openHour={schedule[i].open}
-              closeHour={schedule[i].close}
+              openHour={schedule[i]?.openResto || SCHEDULE_SAMPLE[i].openResto}
+              closeHour={
+                schedule[i]?.closeResto || SCHEDULE_SAMPLE[i].closeResto
+              }
+              isOpen={schedule[i].isOpen}
               onPress={() =>
                 navigationServices.Navigate(editRouteName, {
                   dayName: name,
-                  defaultVal: schedule[i],
-                  onSubmit: data => onSubmitScheduleItem(i, data),
+                  defaultVal: schedule[i].openResto
+                    ? schedule[i]
+                    : SCHEDULE_SAMPLE[i],
+                  onSubmit: data => onSubmitScheduleItem(i, data, id),
                 })
               }
             />
@@ -89,8 +140,9 @@ const FormWorkHour = ({ onValidSubmit, isFirstSetup, editRouteName }) => {
       <Button
         style={styles.submit}
         size="large"
+        state={propIsLoading ? "loading" : "default"}
         text={isFirstSetup ? "Selanjutnya" : "Simpan"}
-        onPress={() => onValidSubmit(schedule)}
+        onPress={onSubmit}
       />
     </View>
   )

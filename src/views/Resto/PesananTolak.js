@@ -67,7 +67,7 @@ const PesananTolak = () => {
           />
           <Button
             style={styles.button}
-            text="Submit"
+            text="Konfirm"
             size="large"
             onPress={onSubmit}
           />

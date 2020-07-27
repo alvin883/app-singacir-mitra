@@ -18,10 +18,18 @@ const MakComblangStack = () => (
       options={{ title: "Mak Comblang" }}
       initialParams={{ withGoBack: true, ...initParams }}
     />
+
     <Stack.Screen
       name="makcomblang/detail"
       component={MakComblang.Detail}
       options={({ route }) => ({ title: route.params.title })}
+      initialParams={initParams}
+    />
+
+    <Stack.Screen
+      name="makcomblang/register"
+      component={MakComblang.Register}
+      options={{ title: "Daftar Mak Comblang" }}
       initialParams={initParams}
     />
 

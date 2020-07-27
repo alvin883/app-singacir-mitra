@@ -78,6 +78,7 @@ const Dashboard = ({ route, navigation }) => {
     [role.WARUNG]: Colors.brandWarung,
   }
   const currentRole = route.params?.authRole
+  console.log("currentRole", currentRole)
   const currentColor = colorList[currentRole]
 
   useFocusEffect(

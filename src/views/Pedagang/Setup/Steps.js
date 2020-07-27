@@ -1,16 +1,28 @@
-import React, { Component, useState, useEffect } from "react"
+import React, { Component, useState, useEffect, useCallback } from "react"
 import { View, Text, StyleSheet, ScrollView, BackHandler } from "react-native"
 import PropTypes from "prop-types"
 import { Spaces } from "_styles"
 import { Stepper } from "_atoms"
-import { navigationServices } from "_utils"
+import { navigationServices, asyncHandle } from "_utils"
 import StepProfile from "./StepProfile"
 import StepWorkHour from "./StepWorkHour"
 import StepPayment from "./StepPayment"
-import { FormAddressData, FormWorkHour } from "_organisms"
+import {
+  FormAddressData,
+  FormWorkHour,
+  FormMerchantData,
+  FormPaymentData,
+} from "_organisms"
 import { IconName } from "_c_a_icons"
-// import { useDispatch } from "react-redux"
-// import { auth } from "_actions"
+import { useSelector } from "react-redux"
+import AsyncStorage from "@react-native-community/async-storage"
+import { useFocusEffect } from "@react-navigation/native"
+import axios from "axios"
+import TextData from "../TextData"
+
+const FormMerchantDataText = TextData.FormMerchantDataText
+const FormAddressDataText = TextData.FormAddressDataText
+const FormPaymentDataText = TextData.FormPaymentDataText
 
 const Steps = () => {
   const [step, setStep] = useState(0)
@@ -20,20 +32,33 @@ const Steps = () => {
   const [dataPayment, setDataPayment] = useState(undefined)
   const [isLoading, setLoading] = useState(false)
   // const dispatch = useDispatch()
+  const mitraId = useSelector(state => state.authReducer.mitraId)
 
   const stepComponents = [
-    <StepProfile
+    <FormMerchantData
       data={dataProfile}
+      text={FormMerchantDataText}
+      {...props => ({
+        text: {
+          ...props.text,
+          ...{
+            heading: "Profil Dagangan",
+          },
+        },
+      })}
       onValidSubmit={data => {
         setDataProfile(data)
         setStep(step + 1)
+        updateAsyncStorage({ _dataProfile: { ...data } })
       }}
     />,
     <FormAddressData
       data={dataAddress}
+      text={FormAddressDataText}
       onValidSubmit={data => {
         setDataAddress(data)
         setStep(step + 1)
+        updateAsyncStorage({ _dataAddress: { ...data } })
       }}
       pinMapRouteName="pedagang/setup/set-pin-map"
       iconMarker={IconName.mapMarkerPedagang}
@@ -43,19 +68,168 @@ const Steps = () => {
       onValidSubmit={data => {
         setDataWorkHour(data)
         setStep(step + 1)
+        updateAsyncStorage({ _dataWorkHour: { ...data } })
       }}
       editRouteName="pedagang/setup/edit-jadwal"
     />,
-    <StepPayment
+    <FormPaymentData
       data={dataPayment}
+      text={FormPaymentDataText}
+      isLoading={isLoading}
       onValidSubmit={data => {
         setLoading(true)
         setDataPayment(data)
-        // dispatch(auth.hasSetup({ hasSetup: true }))
-        navigationServices.Navigate("pedagang/setup/success")
+        // updateAsyncStorage({ _dataPayment: { ...data } })
+        onSubmit()
       }}
     />,
   ]
+
+  const updateAsyncStorage = async ({
+    _dataProfile = dataProfile,
+    _dataPayment = dataPayment,
+    _dataAddress = dataAddress,
+    _dataWorkHour = dataWorkHour,
+  }) => {
+    const _data = {
+      // Use spread operator to make new reference, because there will be
+      // a deletion operator
+      dataProfile: { ..._dataProfile },
+      dataPayment: _dataPayment,
+      dataAddress: _dataAddress,
+      dataWorkHour: _dataWorkHour,
+    }
+
+    // don't save photo to Async storage
+    // delete _data.dataProfile.coverPhoto
+    console.log("updateAsyncStorage", _data)
+
+    const data = JSON.stringify(_data)
+    const savePromise = AsyncStorage.setItem("pedagangSetupProfile", data)
+    const [saveResult, saveErr] = await asyncHandle(savePromise)
+    if (saveErr) return console.log("saveErr", saveErr)
+  }
+
+  const errorHandler = (err, titleLog = "Steps Error", errorCodeLog = "") => {
+    console.log(titleLog, err)
+    // console.log(titleLog, err.request)
+    console.log(titleLog, err?.response?.data)
+    alert(
+      `Terjadi kesalahan, silahkan coba beberapa saat lagi${
+        errorCodeLog ? `\n\ncodeError: ${errorCodeLog}` : ``
+      }`,
+    )
+    setLoading(false)
+    return false
+  }
+
+  const onSubmit = async () => {
+    setLoading(true)
+
+    if (!dataProfile?.coverPhoto?.uri) {
+      setLoading(false)
+      alert("Tolong upload cover foto di step 1")
+      return false
+    }
+
+    if (!dataPayment?.savingBook?.uri) {
+      setLoading(false)
+      alert("Tolong upload buku tabungan di step 4")
+      return false
+    }
+
+    // Upload cover image
+    let apiData = new FormData()
+    apiData.append("image", {
+      uri: dataProfile.coverPhoto.uri,
+      name: "pedagangCoverPhoto.jpg",
+      type: "image/jpeg",
+    })
+    let apiPromise = axios.post("uploadimage/pedagang", apiData)
+    let [apiRes, apiErr] = await asyncHandle(apiPromise)
+    if (apiErr) return errorHandler(apiErr, "photoErr", "photo-1")
+    const uploadedImageURL = apiRes.data.image_url
+
+    // TODO:
+    // Upload Bank Photo
+    // let apiData = new FormData()
+    // apiData.append("image", {
+    //   uri: dataPayment.savingBook.uri,
+    //   name: "mitrabank.jpg",
+    //   type: "image/jpeg",
+    // })
+    // let apiPromise = axios.post("uploadimage/mitrabank", apiData)
+    // let [apiRes, apiErr] = await asyncHandle(apiPromise)
+    // if (apiErr) return errorHandler(apiErr, "photoErr", "photo-1")
+
+    const sendOptions = { params: { mitraId: mitraId } }
+    const sendData = {
+      mitraId: mitraId,
+      name: dataProfile.name,
+      description: dataProfile.description,
+      email: dataProfile.email,
+      pedangangCategory: dataProfile.category,
+      phoneNumber: dataProfile.phoneNumber,
+      address: dataAddress.address,
+      kelurahan: dataAddress.kelurahan,
+      kecamatan: dataAddress.kecamatan,
+      zipcode: dataAddress.postCode,
+      longCoordinate: (dataAddress?.pinMap?.longitude || 0).toString(),
+      latCoordinate: (dataAddress?.pinMap?.latitude || 0).toString(),
+      coverPict: uploadedImageURL,
+    }
+
+    console.log("dataProfile", dataProfile)
+    console.log("sendData", sendData)
+    console.log("photonya", uploadedImageURL)
+
+    // Add Pedagang
+    const sendPromise = axios.post("pedagang/add", sendData, sendOptions)
+    const [sendResponse, sendErr] = await asyncHandle(sendPromise)
+    if (sendErr) return errorHandler(sendErr, "sendErr", "add-1")
+
+    // Add Pedagang Schedules
+    const pedagangId = sendResponse.data.data.id
+    console.log("pedagangId", pedagangId)
+    for (let i = 0; i < dataWorkHour.length; i++) {
+      const schedulePromise = axios.post(
+        "pedagangoperation/add",
+        {
+          ...dataWorkHour[i],
+          pedagangId: pedagangId,
+          openPedagang: dataWorkHour[i]?.openResto || "00:00",
+          closePedagang: dataWorkHour[i].closeResto || "00:00",
+          isOpen: dataWorkHour[i]?.openResto ? dataWorkHour[i].isOpen : false,
+        },
+        { params: { mitraId } },
+      )
+      const [scheduleRes, scheduleErr] = await asyncHandle(schedulePromise)
+      if (scheduleErr) {
+        return errorHandler(scheduleErr, `scheduleErr [${i}]`, `sch-${i}`)
+      }
+    }
+
+    // Add Mitra Bank
+    const bankData = {
+      accountName: dataPayment.name,
+      accountNumber: dataPayment.account,
+      bankNameId: dataPayment.bank,
+      phoneNumber: dataPayment.phoneNumber,
+    }
+    const bankOptions = { params: { mitraId: mitraId } }
+    const bankPromise = axios.post("mitrabank/add", bankData, bankOptions)
+    const [bankRes, bankErr] = await asyncHandle(bankPromise)
+    if (bankErr) return errorHandler(bankErr, "bankErr", "bank-1")
+
+    const resetPromise = AsyncStorage.removeItem("pedagangSetupProfile")
+    const [resetRes, resetErr] = await asyncHandle(resetPromise)
+    if (resetErr) return errorHandler(resetErr, "resetErr", "reset-1")
+
+    console.log("Success Register")
+    // dispatch(auth.setSetup({ hasSetup: true }))
+    navigationServices.Navigate("pedagang/setup/success")
+    setLoading(false)
+  }
 
   const handleBackPress = () => {
     const currentRouteName = navigationServices.CurrentRouteName()
@@ -92,6 +266,27 @@ const Steps = () => {
       BackHandler.removeEventListener("hardwareBackPress", handleBackPress)
     }
   })
+
+  const restoreFunc = async () => {
+    const restorePromise = AsyncStorage.getItem("pedagangSetupProfile")
+    const [restoreData, restoreErr] = await asyncHandle(restorePromise)
+    if (restoreErr) return console.log("pedagangreErr", restoreErr)
+
+    // No stored data before
+    if (!restoreData) return false
+
+    const data = JSON.parse(restoreData)
+    setDataProfile({ ...dataProfile, ...data?.dataProfile })
+    setDataAddress({ ...dataAddress, ...data?.dataAddress })
+    setDataWorkHour({ ...dataWorkHour, ...data?.dataWorkHour })
+    setDataPayment({ ...dataPayment, ...data?.dataPayment })
+  }
+
+  useFocusEffect(
+    useCallback(() => {
+      restoreFunc()
+    }, []),
+  )
 
   return (
     <ScrollView>
